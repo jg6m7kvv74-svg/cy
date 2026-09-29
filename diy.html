@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Design Your Own Crystal Window — LuminaGems</title>
+    <meta name="description" content="Craft a crystal window decoration as unique as your intention. Choose your stones, preview the arrangement, and bring your healing design to life.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="font/iconfont.css">
+    <script>
+        tailwind.config = {
+            theme: { extend: {
+                colors: { primary: '#6B4E2E', secondary: '#C9A227',
+                    neutral: { 100:'#FAF6F0', 200:'#E8E0D4', 300:'#D6CCBE', 600:'#5C4A38', 700:'#4A3B2C', 800:'#3A2C1E', 900:'#2A1F14' } },
+                fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+                container: { center: true, padding: { DEFAULT:'1rem', sm:'1.5rem', lg:'2rem' }, screens: { lg:'1200px', xl:'1200px' } },
+                boxShadow: { soft:'0 4px 24px rgba(107,78,46,0.08)', card:'0 8px 30px rgba(42,31,20,0.06)' }
+            } }
+        }
+    </script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Inter', system-ui, sans-serif; }
+        .text-shadow { text-shadow: 0 2px 24px rgba(0,0,0,0.55); }
+        .section-title { position: relative; display: inline-block; }
+        .section-title::after { content:''; display:block; width:64px; height:3px; background:linear-gradient(90deg,#6B4E2E,#C9A227); border-radius:2px; margin:14px auto 0; }
+        .hover-lift { transition: transform .35s ease, box-shadow .35s ease; }
+        .hover-lift:hover { transform: translateY(-6px); box-shadow: 0 16px 40px rgba(42,31,20,0.12); }
+
+        /* DIY 标签页切换 */
+        .tab-btn { transition: all .3s ease; }
+        .tab-btn.active { background: linear-gradient(135deg, #6B4E2E, #5C452A); color:#fff; box-shadow: 0 6px 18px rgba(107,78,46,0.35); }
+
+        .component-item { transition: all .2s ease; }
+        .component-item:hover { background-color:#F5EBD8; transform: translateX(4px); }
+
+        /* 悬浮组件（脱离文档流） */
+        .agent-fab { position:fixed; right:24px; bottom:24px; z-index:9999; width:58px; height:58px; border-radius:9999px; background:linear-gradient(135deg,#6B4E2E,#4E3620); color:#fff; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 24px rgba(107,78,46,0.45); cursor:pointer; transition:transform .25s ease; border:none; }
+        .agent-fab:hover { transform: scale(1.08); }
+        .back-to-top { position:fixed; right:24px; bottom:96px; z-index:9998; width:46px; height:46px; border-radius:9999px; background:rgba(58,44,30,0.85); color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:opacity .3s ease, transform .3s ease; opacity:0; pointer-events:none; border:none; }
+        .back-to-top.visible { opacity:1; pointer-events:auto; }
+        .back-to-top:hover { transform: translateY(-3px); background:#3A2C1E; }
+        .cookie-banner { position:fixed; left:0; right:0; bottom:0; z-index:9997; background:#2A1F14; color:#E8E0D4; transform:translateY(100%); transition:transform .4s ease; }
+        .cookie-banner.show { transform:translateY(0); }
+        /* i18n 翻译后调整:中文/日文使用更柔和的阴影,避免叠影 */
+        h1.text-shadow, h2.text-shadow { text-shadow: 0 2px 12px rgba(0,0,0,0.4); }
+    </style>
+    <style>
+        .search-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 9996; background: rgba(42,31,20,0.6); backdrop-filter: blur(4px); opacity: 0; pointer-events: none; transition: opacity .3s ease; }
+        .search-overlay.active { opacity: 1; pointer-events: auto; }
+        .search-panel { max-width: 640px; margin: 120px auto 0; background: #fff; border-radius: 24px; padding: 32px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); transform: translateY(-20px); transition: transform .3s ease; }
+        .search-overlay.active .search-panel { transform: translateY(0); }
+        .lang-dropdown { position: absolute; top: calc(100% + 8px); right: 0; min-width: 140px; background: #fff; border-radius: 12px; box-shadow: 0 8px 30px rgba(42,31,20,0.12); padding: 6px; z-index: 100; opacity: 0; pointer-events: none; transform: translateY(-4px); transition: all .2s ease; }
+        .lang-dropdown.show { opacity: 1; pointer-events: auto; transform: translateY(0); }
+        .lang-option { display: block; width: 100%; text-align: left; padding: 8px 12px; border-radius: 8px; font-size: 14px; color: #4A3B2C; background: transparent; border: none; cursor: pointer; transition: background .15s ease; }
+        .lang-option:hover { background: #FAF6F0; }
+        .lang-option.active { background: #F5EBD8; color: #6B4E2E; font-weight: 600; }
+    </style>
+</head>
+<body class="font-sans text-neutral-800 bg-neutral-100">
+
+    <!-- ============ 统一顶部导航（内页实心） ============ -->
+    <header id="navbar" class="fixed w-full top-0 z-50 transition-all duration-300 bg-neutral-900/95 backdrop-blur-md shadow-lg">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <a href="index.html" class="flex items-center gap-2 text-2xl font-bold text-white">
+                    <img src="images/logo.jpg" alt="LuminaGems" class="w-9 h-9 rounded-full object-cover ring-2 ring-white/40">
+                    LuminaGems
+                </a>
+                <nav class="hidden lg:flex items-center gap-8 text-sm font-medium tracking-wide">
+                    <a href="index.html" class="text-white/80 hover:text-secondary transition-colors">Home</a>
+                    <a href="products.html" class="text-white/80 hover:text-secondary transition-colors">Shop</a>
+                    <a href="our-story.html" class="text-white/80 hover:text-secondary transition-colors">Our Story</a>
+                    <a href="our-values.html" class="text-white/80 hover:text-secondary transition-colors">Our Values</a>
+                    <a href="blog.html" class="text-white/80 hover:text-secondary transition-colors">Blog</a>
+                    <a href="resources.html" class="text-white/80 hover:text-secondary transition-colors">Resources</a>
+                </nav>
+                <div class="flex items-center gap-5 text-white">
+                    <button id="searchBtn" aria-label="Search" class="hover:text-secondary transition-colors hidden sm:block"><i class="fa fa-search text-lg"></i></button><div class="relative hidden md:block"><button id="langToggle" class="flex items-center gap-1.5 text-sm hover:text-secondary transition-colors cursor-pointer"><i class="fa fa-globe"></i><span id="langCurrent">EN</span><i class="fa fa-caret-down text-xs"></i></button><div id="langMenu" class="lang-dropdown"><button data-lang="EN" class="lang-option active">English</button><button data-lang="ZH" class="lang-option">中文</button><button data-lang="JA" class="lang-option">日本語</button></div></div>
+                    <a href="account.html" aria-label="Wishlist" class="hover:text-secondary transition-colors hidden sm:block"><i class="fa fa-heart-o text-lg"></i></a>
+                    <a href="cart.html" aria-label="Cart" class="relative hover:text-secondary transition-colors">
+                        <i class="fa fa-shopping-bag text-lg"></i>
+                        <span class="absolute -top-2 -right-2 bg-secondary text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">2</span>
+                    </a>
+                    <a href="zuce.html" aria-label="Account" class="hover:text-secondary transition-colors"><i class="iconfont icon-denglu" style="font-size:22px;"></i></a>
+                    <button id="menu-toggle" class="lg:hidden hover:text-secondary transition-colors" aria-label="Menu"><i class="fa fa-bars text-xl"></i></button>
+                </div>
+            </div>
+        </div>
+        <div id="mobile-menu" class="hidden lg:hidden bg-white shadow-lg absolute w-full">
+            <div class="container mx-auto px-4 py-4 flex flex-col space-y-1 text-neutral-800">
+                <a href="index.html" class="py-2.5 hover:text-primary transition-colors border-b border-neutral-100">Home</a>
+                <a href="products.html" class="py-2.5 hover:text-primary transition-colors border-b border-neutral-100">Shop</a>
+                <a href="our-story.html" class="py-2.5 hover:text-primary transition-colors border-b border-neutral-100">Our Story</a>
+                <a href="our-values.html" class="py-2.5 hover:text-primary transition-colors border-b border-neutral-100">Our Values</a>
+                <a href="blog.html" class="py-2.5 hover:text-primary transition-colors border-b border-neutral-100">Blog</a>
+                <a href="resources.html" class="py-2.5 hover:text-primary transition-colors border-b border-neutral-100">Resources</a>
+                <a href="contact.html" class="py-2.5 hover:text-primary transition-colors">Contact</a>
+            </div>
+        </div>
+        </header>
+
+    <!-- 搜索面板（全屏覆盖式，脱离文档流） -->
+    <div id="searchOverlay" class="search-overlay">
+        <div class="search-panel">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-semibold text-neutral-900">Search LuminaGems</h3>
+                <button id="searchClose" class="text-neutral-400 hover:text-neutral-700 transition-colors" aria-label="Close search"><i class="fa fa-times text-2xl"></i></button>
+            </div>
+            <form id="searchForm" class="relative">
+                <i class="fa fa-search absolute left-5 top-1/2 -translate-y-1/2 text-neutral-400"></i>
+                <input id="searchInput" type="text" placeholder="Search crystals, healing guides, blog..." class="w-full pl-12 pr-4 py-4 border border-neutral-200 rounded-full text-base focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+            </form>
+            <div class="mt-6">
+                <p class="text-sm text-neutral-500 mb-3">Popular Searches</p>
+                <div class="flex flex-wrap gap-2">
+                    <a href="products.html?q=amethyst" class="px-4 py-2 bg-neutral-100 hover:bg-primary hover:text-white rounded-full text-sm transition-colors">Amethyst</a>
+                    <a href="products.html?q=rose+quartz" class="px-4 py-2 bg-neutral-100 hover:bg-primary hover:text-white rounded-full text-sm transition-colors">Rose Quartz</a>
+                    <a href="products.html?q=pet+friendly" class="px-4 py-2 bg-neutral-100 hover:bg-primary hover:text-white rounded-full text-sm transition-colors">Pet Friendly</a>
+                    <a href="blog.html" class="px-4 py-2 bg-neutral-100 hover:bg-primary hover:text-white rounded-full text-sm transition-colors">Meditation Guide</a>
+                    <a href="products.html?q=healing+gift" class="px-4 py-2 bg-neutral-100 hover:bg-primary hover:text-white rounded-full text-sm transition-colors">Healing Gift</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== DIY 可视化水晶装饰窗 ===================== -->
+    <main class="diy-builder">
+    <style>
+        /* ------- DIY Builder · LuminaGems 暖米大地棕主题 ------- */
+        .diy-builder{
+            --brown:#6B4E2E; --brown-d:#4E3620; --gold:#C9A227;
+            --yellow:#F4B400; --yellow-d:#DEA700; --orange:#F97316;
+            --bg:#FAF6F0; --panel:#FFFFFF; --line:#E8E0D4;
+            --ink:#2A1F14; --muted:#7A6A55;
+            background:var(--bg); color:var(--ink);
+            padding-top:92px; min-height:100vh;
+            font-family:'Inter',system-ui,sans-serif;
+        }
+        /* —— 顶部预览区 —— */
+        .diy-preview-wrap{ background:var(--panel); border-bottom:1px solid var(--line); padding:28px 16px; }
+        .diy-preview-inner{ max-width:1100px; margin:0 auto; display:flex; align-items:center; justify-content:center; gap:22px; flex-wrap:wrap; }
+        .diy-side-tools{ display:flex; flex-direction:column; gap:12px; }
+        .diy-side-tools button{ width:54px; height:64px; border-radius:14px; border:1px solid var(--line); background:#fff; color:var(--brown); cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; font-size:11px; transition:.2s; }
+        .diy-side-tools button i{ font-size:18px; }
+        .diy-side-tools button:hover{ border-color:var(--gold); color:var(--gold); }
+        .diy-stage-wrap{ flex:1 1 300px; min-width:260px; max-width:380px; display:flex; justify-content:center; }
+        .diy-preview-stage{ position:relative; width:100%; aspect-ratio:1888/2304; }
+        .diy-window-img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:1; }
+        .diy-crystal-layer{ position:absolute; inset:0; z-index:2; }
+        .diy-crystal{ position:absolute; object-fit:contain; transform:translate(-50%,-50%); cursor:grab; transition:transform .15s ease; filter:drop-shadow(0 2px 5px rgba(0,0,0,0.40)); user-select:none; -webkit-user-drag:none; touch-action:none; }
+        .diy-crystal:hover{ transform:translate(-50%,-50%) scale(1.22); z-index:5; }
+        .diy-crystal.dragging{ cursor:grabbing; transform:translate(-50%,-50%); z-index:30; transition:none; }
+        .diy-crystal.selected{ filter:drop-shadow(0 0 0 2px #C9A227) drop-shadow(0 2px 6px rgba(0,0,0,0.35)); }
+        .diy-params{ width:150px; display:flex; flex-direction:column; background:#fff; border:1px solid var(--line); border-radius:16px; overflow:hidden; }
+        .diy-param-row{ display:flex; justify-content:space-between; align-items:center; padding:12px 14px; font-size:13px; border-bottom:1px solid var(--line); }
+        .diy-param-row:last-child{ border-bottom:none; }
+        .diy-param-row .k{ color:var(--muted); }
+        .diy-param-row .v{ font-weight:600; color:var(--ink); }
+        /* —— 选中水晶缩放条 —— */
+        .diy-resize-bar{ max-width:1100px; margin:14px auto 0; display:flex; align-items:center; justify-content:center; gap:12px; flex-wrap:wrap; }
+        .diy-resize-bar[hidden]{ display:none; }
+        .diy-resize-bar .diy-resize-label{ font-size:13px; color:var(--muted); display:flex; align-items:center; gap:6px; }
+        .diy-resize-bar button{ width:36px; height:36px; border-radius:10px; border:1px solid var(--line); background:#fff; color:var(--brown); cursor:pointer; font-size:18px; font-weight:700; line-height:1; }
+        .diy-resize-bar button:hover{ border-color:var(--gold); color:var(--gold); }
+        .diy-resize-bar input[type=range]{ width:180px; accent-color:#C9A227; }
+        .diy-resize-value{ font-size:13px; font-weight:700; color:var(--brown); min-width:44px; text-align:center; }
+        /* —— 预览区底部 —— */
+        .diy-preview-footer{ max-width:1100px; margin:22px auto 0; display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+        .diy-hint{ flex:1 1 auto; color:#fff; background:var(--orange); border-radius:999px; padding:10px 18px; font-size:13px; display:flex; align-items:center; gap:8px; }
+        .diy-hint.hidden{ display:none; }
+        .diy-actions{ display:flex; gap:12px; }
+        .diy-btn{ border:none; border-radius:999px; padding:10px 26px; font-size:14px; font-weight:600; cursor:pointer; transition:.2s; }
+        .diy-btn-secondary{ background:#fff; color:var(--brown); border:1px solid var(--line); }
+        .diy-btn-secondary:hover{ border-color:var(--gold); color:var(--gold); }
+        .diy-btn-primary{ background:var(--yellow); color:#2A1F14; }
+        .diy-btn-primary:hover{ background:var(--yellow-d); }
+        /* —— 底部配件选择区 —— */
+        .diy-picker{ max-width:1200px; margin:0 auto; padding:24px 16px 60px; }
+        .diy-picker-head{ display:flex; align-items:center; justify-content:space-between; gap:12px; border-bottom:1px solid var(--line); }
+        .diy-tabs{ display:flex; gap:4px; overflow-x:auto; }
+        .diy-tab{ background:none; border:none; padding:12px 14px; font-size:14px; color:var(--muted); cursor:pointer; white-space:nowrap; border-bottom:3px solid transparent; }
+        .diy-tab.active{ color:var(--brown); font-weight:700; border-bottom-color:var(--yellow); }
+        .diy-head-icons{ display:flex; gap:4px; }
+        .diy-head-icons button{ width:36px; height:36px; border-radius:10px; border:1px solid var(--line); background:#fff; color:var(--muted); cursor:pointer; font-size:14px; }
+        .diy-head-icons button:hover{ color:var(--gold); border-color:var(--gold); }
+        .diy-search-box{ margin-top:12px; }
+        .diy-search-box input{ width:100%; max-width:420px; padding:10px 16px; border:1px solid var(--line); border-radius:12px; font-size:14px; outline:none; background:#fff; }
+        .diy-picker-body{ display:flex; gap:20px; margin-top:18px; }
+        .diy-colors{ display:flex; flex-direction:column; gap:6px; min-width:112px; }
+        .diy-color{ background:none; border:none; text-align:left; padding:9px 14px; border-radius:10px; font-size:13px; color:var(--muted); cursor:pointer; white-space:nowrap; }
+        .diy-color.active{ background:var(--yellow); color:#2A1F14; font-weight:600; }
+        .diy-grid{ flex:1; display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+        .diy-card{ background:#fff; border:1px solid var(--line); border-radius:16px; padding:16px; text-align:center; cursor:pointer; transition:.2s; position:relative; }
+        .diy-card:hover{ transform:translateY(-4px); box-shadow:0 10px 24px rgba(42,31,20,0.10); }
+        .diy-card.soldout{ opacity:.5; cursor:not-allowed; }
+        .diy-card.soldout:hover{ transform:none; box-shadow:none; }
+        .diy-card-thumb{ width:80px; height:80px; margin:0 auto 10px; }
+        .diy-card-thumb img{ width:100%; height:100%; object-fit:contain; display:block; filter:drop-shadow(0 2px 6px rgba(42,31,20,0.25)); }
+        .diy-card-name{ font-size:14px; font-weight:600; margin-bottom:4px; }
+        .diy-card-price{ font-size:15px; font-weight:700; color:var(--brown); margin-bottom:8px; }
+        .diy-card-tag{ display:inline-block; background:var(--yellow); color:#2A1F14; font-size:11px; font-weight:600; padding:2px 8px; border-radius:999px; }
+        .diy-sold-badge{ position:absolute; top:10px; right:10px; background:#9CA3AF; color:#fff; font-size:11px; padding:2px 8px; border-radius:999px; }
+        .diy-empty{ grid-column:1/-1; text-align:center; color:var(--muted); padding:40px 0; font-size:14px; }
+        /* —— 完成弹窗 —— */
+        .diy-modal-mask{ position:fixed; inset:0; z-index:9000; background:rgba(42,31,20,0.5); display:flex; align-items:center; justify-content:center; }
+        .diy-modal-mask[hidden]{ display:none; }
+        .diy-modal{ background:#fff; border-radius:20px; padding:32px; text-align:center; max-width:340px; width:90%; }
+        .diy-modal .icon{ width:56px; height:56px; margin:0 auto 14px; border-radius:50%; background:#EFF6E0; color:#5c8a1e; display:flex; align-items:center; justify-content:center; font-size:26px; }
+        .diy-modal h3{ font-size:18px; margin-bottom:8px; }
+        .diy-modal p{ font-size:13px; color:var(--muted); margin-bottom:20px; }
+        .diy-modal button{ background:var(--yellow); color:#2A1F14; border:none; border-radius:999px; padding:10px 30px; font-weight:600; cursor:pointer; }
+        @media(max-width:900px){ .diy-grid{ grid-template-columns:repeat(2,1fr); } }
+        @media(max-width:640px){
+            .diy-params{ width:100%; flex-direction:row; border-radius:14px; }
+            .diy-param-row{ flex:1; flex-direction:column; align-items:center; gap:4px; border-bottom:none; border-right:1px solid var(--line); padding:10px 6px; }
+            .diy-param-row:last-child{ border-right:none; }
+            .diy-picker-body{ flex-direction:column; }
+            .diy-colors{ flex-direction:row; overflow-x:auto; min-width:0; padding-bottom:4px; }
+            .diy-grid{ grid-template-columns:repeat(2,1fr); }
+        }
+    </style>
+
+    <!-- ===== 上半：预览区 ===== -->
+    <section class="diy-preview-wrap">
+        <div class="diy-preview-inner">
+            <!-- 左侧竖排工具按钮 -->
+            <div class="diy-side-tools">
+                <button title="尺寸"><i class="fa fa-arrows-h"></i>尺寸</button>
+                <button title="工具"><i class="fa fa-wrench"></i>工具</button>
+            </div>
+            <!-- 中间窗户造型预览框 -->
+            <div class="diy-stage-wrap">
+                <div class="diy-preview-stage" id="diyStage">
+                    <img class="diy-window-img" src="new_pics/window.png" alt="水晶装饰窗预览">
+                    <div class="diy-crystal-layer" id="diyCrystalLayer"></div>
+                </div>
+            </div>
+            <!-- 右侧参数面板 -->
+            <div class="diy-params">
+                <div class="diy-param-row"><span class="k">装饰件数</span><span class="v">12件</span></div>
+                <div class="diy-param-row"><span class="k">已用数量</span><span class="v" id="diyUsed">0</span></div>
+                <div class="diy-param-row"><span class="k">克重</span><span class="v" id="diyWeight">0.00g</span></div>
+                <div class="diy-param-row"><span class="k">价格</span><span class="v" id="diyPrice">¥0.00</span></div>
+            </div>
+        </div>
+        <div class="diy-resize-bar" id="diyResizeBar" hidden>
+            <span class="diy-resize-label"><i class="fa fa-arrows-alt"></i> 水晶尺寸</span>
+            <button id="diySizeMinus" aria-label="缩小">−</button>
+            <input type="range" id="diySizeRange" min="30" max="200" value="100" step="1">
+            <button id="diySizePlus" aria-label="放大">＋</button>
+            <span class="diy-resize-value" id="diySizeValue">100%</span>
+        </div>
+        <!-- 预览区底部：提示条 + 按钮 -->
+        <div class="diy-preview-footer">
+            <div class="diy-hint" id="diyHint"><i class="fa fa-exclamation-circle"></i>装饰数量不足，请继续添加水晶~</div>
+            <div class="diy-actions">
+                <button class="diy-btn diy-btn-secondary" id="diySave">保存</button>
+                <button class="diy-btn diy-btn-primary" id="diyComplete">完成</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== 下半：配件选择区 ===== -->
+    <div class="diy-picker">
+        <!-- 顶部标签导航 + 图标 -->
+        <div class="diy-picker-head">
+            <div class="diy-tabs" id="diyTabs"></div>
+            <div class="diy-head-icons">
+                <button id="diySearchBtn" title="搜索"><i class="fa fa-search"></i></button>
+                <button id="diySortBtn" title="排序"><i class="fa fa-sort-amount-asc"></i></button>
+            </div>
+        </div>
+        <div class="diy-search-box" id="diySearchBox" hidden>
+            <input type="text" id="diySearchInput" placeholder="搜索水晶名称…">
+        </div>
+        <div class="diy-picker-body">
+            <aside class="diy-colors" id="diyColors"></aside>
+            <div class="diy-grid" id="diyGrid"></div>
+        </div>
+    </div>
+
+    <!-- 设计完成弹窗 -->
+    <div class="diy-modal-mask" id="diyModal" hidden>
+        <div class="diy-modal">
+            <div class="icon"><i class="fa fa-check"></i></div>
+            <h3 id="diyModalTitle">设计完成</h3>
+            <p id="diyModalText">你的专属水晶装饰窗已设计完成。</p>
+            <button id="diyModalClose">好的</button>
+        </div>
+    </div>
+
+    </main>
+
+    <script>
+    /* ================= DIY 可视化水晶装饰窗 逻辑 ================= */
+    (function () {
+        /* ---- 数据层（与视图分离，便于后续批量新增水晶素材）---- */
+        var TABS = ['主珠', '配饰', '三通&吊坠', '隔片', '绳子', '悦己'];
+        var COLORS = ['白色系', '黑色系', '粉色系', '黄色系', '蓝色系', '绿色系', '咖色系', '紫色系'];
+        // item 字段：id / tab(所属大类) / color(色系) / name(英文名) / size(规格mm) / price(元) / weight(克) / img(真实水晶图) / soldOut
+        var ITEMS = [
+            { id: 'bq-1', tab: '主珠', color: '蓝色系', name: 'Blue Quartz Cluster', size: 10, price: 88.00, weight: 12.0, img: 'new_pics/blue-quartz-cluster.png', soldOut: false },
+            { id: 'rq-1', tab: '主珠', color: '粉色系', name: 'Rose Quartz', size: 16, price: 58.00, weight: 11.0, img: 'new_pics/rose-quartz.png', soldOut: false },
+            { id: 'fp-1', tab: '主珠', color: '紫色系', name: 'Fluorite Point', size: 15, price: 118.00, weight: 15.0, img: 'new_pics/fluorite-point.png', soldOut: false },
+            { id: 'cp-1', tab: '主珠', color: '黄色系', name: 'Citrine Point', size: 14, price: 76.00, weight: 14.0, img: 'new_pics/citrine-point.png', soldOut: false },
+            { id: 'sq-1', tab: '主珠', color: '咖色系', name: 'Smoky Quartz', size: 13, price: 48.00, weight: 9.0, img: 'new_pics/smoky-quartz.png', soldOut: false },
+            { id: 'cq-1', tab: '主珠', color: '白色系', name: 'Clear Quartz Point', size: 12, price: 45.00, weight: 9.0, img: 'new_pics/clear-quartz-point.png', soldOut: false },
+            { id: 'mb-1', tab: '主珠', color: '黑色系', name: 'Morion Black Smoky Quartz', size: 14, price: 98.00, weight: 16.0, img: 'new_pics/morion-black-quartz.png', soldOut: false },
+            { id: 'gc-1', tab: '主珠', color: '黄色系', name: 'Golden Citrine Point', size: 14, price: 85.00, weight: 13.0, img: 'new_pics/golden-citrine-point.png', soldOut: false }
+        ];
+        // 1x1 透明占位图：若有素材缺图时兜底
+        var PLACEHOLDER_IMG = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
+        var TARGET_COUNT = 12; // 装饰件数阈值（窗框可容纳的水晶数量）
+
+        /* ---- 状态 ---- */
+        var state = { activeTab: '主珠', activeColor: '白色系', search: '', sortAsc: true, beads: [] };
+
+        /* ---- DOM 引用 ---- */
+        var $ = function (id) { return document.getElementById(id); };
+        var elTabs = $('diyTabs'), elColors = $('diyColors'), elGrid = $('diyGrid');
+        var elLayer = $('diyCrystalLayer'), elStage = $('diyStage');
+        var elUsed = $('diyUsed'), elWeight = $('diyWeight'), elPrice = $('diyPrice'), elHint = $('diyHint');
+
+        /* ---- 工具函数 ---- */
+        function money(v) { return '¥' + v.toFixed(2); }
+        function crystalPx(mm) { return 32 + mm * 0.6; } // 预览水晶摆件像素边长
+
+        /* ---- 计算：已用数量/克重(g)/价格(元) ---- */
+        function calc() {
+            var count = 0, w = 0, p = 0;
+            state.beads.forEach(function (b) { count++; w += b.weight; p += b.price; });
+            return { count: count, weight: w, price: p };
+        }
+
+        /* ---- 渲染顶部标签导航 ---- */
+        function renderTabs() {
+            elTabs.innerHTML = '';
+            TABS.forEach(function (t) {
+                var b = document.createElement('button');
+                b.className = 'diy-tab' + (t === state.activeTab ? ' active' : '');
+                b.textContent = t;
+                b.onclick = function () { state.activeTab = t; renderTabs(); renderGrid(); };
+                elTabs.appendChild(b);
+            });
+        }
+        /* ---- 渲染左侧色系 ---- */
+        function renderColors() {
+            elColors.innerHTML = '';
+            COLORS.forEach(function (c) {
+                var b = document.createElement('button');
+                b.className = 'diy-color' + (c === state.activeColor ? ' active' : '');
+                b.textContent = c;
+                b.onclick = function () { state.activeColor = c; renderColors(); renderGrid(); };
+                elColors.appendChild(b);
+            });
+        }
+
+        /* ---- 筛选当前可见水晶 ---- */
+        function currentItems() {
+            return ITEMS.filter(function (it) {
+                if (it.tab !== state.activeTab) return false;
+                if (state.activeTab === '主珠' && it.color !== state.activeColor) return false;
+                if (state.search && it.name.indexOf(state.search) === -1) return false;
+                return true;
+            }).sort(function (a, b) { return state.sortAsc ? a.price - b.price : b.price - a.price; });
+        }
+        /* ---- 渲染水晶卡片网格 ---- */
+        function renderGrid() {
+            var list = currentItems();
+            elGrid.innerHTML = '';
+            if (!list.length) {
+                var e = document.createElement('div');
+                e.className = 'diy-empty';
+                e.textContent = state.activeTab === '主珠' ? '该色系暂无水晶，敬请期待' : '该分类素材筹备中，敬请期待';
+                elGrid.appendChild(e);
+                return;
+            }
+            list.forEach(function (it) {
+                var card = document.createElement('div');
+                card.className = 'diy-card' + (it.soldOut ? ' soldout' : '');
+                card.innerHTML =
+                    '<div class="diy-card-thumb"><img src="' + (it.img || PLACEHOLDER_IMG) + '" alt="' + it.name + '" loading="lazy"></div>' +
+                    '<div class="diy-card-name">' + it.name + '</div>' +
+                    '<div class="diy-card-price">' + money(it.price) + '</div>' +
+                    '<span class="diy-card-tag">' + it.size + 'mm</span>' +
+                    (it.soldOut ? '<span class="diy-sold-badge">售罄</span>' : '');
+                if (!it.soldOut) card.onclick = function () { addBead(it); };
+                elGrid.appendChild(card);
+            });
+        }
+
+        /* ---- 窗户内部预定摆件位（底部台面 → 前景 → 两侧岩壁 → 上部侧墙） ---- */
+        var SLOTS = [
+            { x: 22, y: 80 }, { x: 50, y: 84 }, { x: 78, y: 80 },   // 底部台面 / 石子路径
+            { x: 36, y: 72 }, { x: 64, y: 72 }, { x: 50, y: 68 },   // 前景中部
+            { x: 20, y: 57 }, { x: 80, y: 57 },                      // 两侧岩壁下方
+            { x: 27, y: 41 }, { x: 73, y: 41 },                      // 两侧岩壁中部
+            { x: 34, y: 27 }, { x: 66, y: 27 }                       // 上部两侧墙
+        ];
+
+        /* ---- 添加 / 删除水晶 ---- */
+        function addBead(it) {
+            var copy = Object.assign({}, it);
+            var s = SLOTS[state.beads.length % SLOTS.length]; // 新水晶默认落在下一个空闲摆件位
+            copy.x = s.x; copy.y = s.y;
+            state.beads.push(copy);
+            renderPreview(); updateTotals();
+        }
+        function removeBead(i) {
+            state.beads.splice(i, 1);
+            if (selectedIndex != null) {                      // 删除后修正选中下标
+                if (selectedIndex === i) selectedIndex = null;
+                else if (selectedIndex > i) selectedIndex--;
+                updateSelection();
+            }
+            renderPreview(); updateTotals();
+        }
+
+        /* ---- 渲染窗户预览：水晶作为摆件放入 window 场景内部 ---- */
+        function renderPreview() {
+            elLayer.innerHTML = '';
+            var W = elStage.clientWidth || 320;
+            var H = elStage.clientHeight || (W * 2304 / 1888);
+            state.beads.forEach(function (b, i) {
+                if (b.x == null || b.y == null) {                 // 兜底：无位置时按摆件位补位
+                    var s = SLOTS[i % SLOTS.length];
+                    b.x = s.x; b.y = s.y;
+                }
+                var sc = clampScale(b.scale || 1);               // 缩放系数 30%~200%
+                var d = crystalPx(b.size) * sc;
+                var half = d / 2;
+                var px = clamp(b.x * W / 100, half, Math.max(half, W - half)); // 缩放后仍留在窗内
+                var py = clamp(b.y * H / 100, half, Math.max(half, H - half));
+                b.x = px / W * 100; b.y = py / H * 100;
+                var img = document.createElement('img');
+                img.className = 'diy-crystal' + (i === selectedIndex ? ' selected' : '');
+                img.draggable = false;                            // 禁用浏览器原生图片拖拽
+                img.src = b.img || PLACEHOLDER_IMG;
+                img.style.width = d + 'px'; img.style.height = d + 'px';
+                img.style.left = px + 'px';
+                img.style.top = py + 'px';
+                img.dataset.index = i;                            // 供拖拽/删除定位到 state.beads
+                img.title = b.name + ' ' + b.size + 'mm（点选后缩放 / 拖动移位 / 双击或右键删除）';
+                img.addEventListener('dblclick', function () { removeBead(i); });
+                img.addEventListener('contextmenu', function (e) { e.preventDefault(); removeBead(i); });
+                elLayer.appendChild(img);
+            });
+        }
+        /* ---- 更新右侧参数 + 提示条 ---- */
+        function updateTotals() {
+            var c = calc();
+            elUsed.textContent = c.count;
+            elWeight.textContent = c.weight.toFixed(2) + 'g';
+            elPrice.textContent = money(c.price);
+            elHint.classList.toggle('hidden', c.count >= TARGET_COUNT);
+        }
+
+        /* ---- 选中 + 拖拽摆放（桌面鼠标 + 移动端触摸） ---- */
+        var selectedIndex = null;               // 当前选中水晶下标（用于缩放控制）
+        var dragState = null;                    // { img, idx, offX, offY }
+        function clamp(v, a, b) { return v < a ? a : (v > b ? b : v); }
+        function clampScale(s) { return clamp(s, 0.3, 2); }       // 缩放范围：原始尺寸 30%~200%
+        // 同步选中高亮 + 缩放条显示/滑块值
+        function updateSelection() {
+            var list = elLayer.querySelectorAll('.diy-crystal');
+            for (var i = 0; i < list.length; i++) {
+                var on = parseInt(list[i].dataset.index, 10) === selectedIndex;
+                list[i].classList.toggle('selected', on);
+            }
+            var bar = $('diyResizeBar'), range = $('diySizeRange'), val = $('diySizeValue');
+            if (selectedIndex == null || !state.beads[selectedIndex]) {
+                bar.hidden = true;
+                return;
+            }
+            var pct = Math.round((state.beads[selectedIndex].scale || 1) * 100);
+            range.value = pct; val.textContent = pct + '%';
+            bar.hidden = false;
+        }
+        // 仅改变当前选中水晶的大小
+        function resizeSelected(newScale) {
+            if (selectedIndex == null || !state.beads[selectedIndex]) return;
+            state.beads[selectedIndex].scale = clampScale(newScale);
+            renderPreview(); updateSelection();
+        }
+        function startDrag(img, pageX, pageY) {
+            var idx = parseInt(img.dataset.index, 10);
+            if (!state.beads[idx]) return;
+            selectedIndex = idx; updateSelection();   // 点击即选中，显示缩放条
+            var rect = elStage.getBoundingClientRect();
+            // 记录抓取点相对水晶中心的偏移，避免拖拽瞬间跳位
+            dragState = {
+                img: img, idx: idx,
+                offX: pageX - (rect.left + state.beads[idx].x * rect.width / 100),
+                offY: pageY - (rect.top + state.beads[idx].y * rect.height / 100)
+            };
+            img.classList.add('dragging');
+            moveDrag(pageX, pageY);
+        }
+        function moveDrag(pageX, pageY) {
+            if (!dragState) return;
+            var b = state.beads[dragState.idx];
+            var rect = elStage.getBoundingClientRect();
+            var W = rect.width, H = rect.height;
+            var half = crystalPx(b.size) * clampScale(b.scale || 1) / 2;
+            var cx = clamp(pageX - rect.left - dragState.offX, half, Math.max(half, W - half)); // 限制水晶整体留在预览框内
+            var cy = clamp(pageY - rect.top - dragState.offY, half, Math.max(half, H - half));
+            dragState.img.style.left = cx + 'px';
+            dragState.img.style.top = cy + 'px';
+            b.x = cx / W * 100; // 存百分比，缩放/重绘后位置保持
+            b.y = cy / H * 100;
+        }
+        function endDrag() {
+            if (!dragState) return;
+            dragState.img.classList.remove('dragging');
+            dragState = null;
+        }
+        elLayer.addEventListener('mousedown', function (e) {
+            if (e.button !== 0) return; // 仅左键拖拽
+            if (e.target.classList && e.target.classList.contains('diy-crystal')) {
+                e.preventDefault();
+                startDrag(e.target, e.clientX, e.clientY);
+            } else {
+                selectedIndex = null; updateSelection(); // 点击空白处取消选中
+            }
+        });
+        document.addEventListener('mousemove', function (e) {
+            if (!dragState) return;
+            e.preventDefault();
+            moveDrag(e.clientX, e.clientY);
+        });
+        document.addEventListener('mouseup', endDrag);
+        // 移动端触摸拖拽增强
+        elLayer.addEventListener('touchstart', function (e) {
+            var target = e.target;
+            e.preventDefault();
+            if (target.classList && target.classList.contains('diy-crystal')) {
+                var t = e.touches[0];
+                startDrag(target, t.clientX, t.clientY);
+            } else {
+                selectedIndex = null; updateSelection();
+            }
+        }, { passive: false });
+        document.addEventListener('touchmove', function (e) {
+            if (!dragState) return;
+            var t = e.touches[0];
+            e.preventDefault();
+            moveDrag(t.clientX, t.clientY);
+        }, { passive: false });
+        document.addEventListener('touchend', endDrag);
+
+        /* ---- 缩放控件绑定（加号 / 减号 / 滑块） ---- */
+        $('diySizeMinus').onclick = function () {
+            var cur = state.beads[selectedIndex] ? clampScale(state.beads[selectedIndex].scale || 1) : 1;
+            resizeSelected(cur - 0.1);
+        };
+        $('diySizePlus').onclick = function () {
+            var cur = state.beads[selectedIndex] ? clampScale(state.beads[selectedIndex].scale || 1) : 1;
+            resizeSelected(cur + 0.1);
+        };
+        $('diySizeRange').addEventListener('input', function () {
+            resizeSelected(parseInt(this.value, 10) / 100);
+        });
+
+        /* ---- 事件绑定 ---- */
+        $('diySearchBtn').onclick = function () {
+            var box = $('diySearchBox');
+            box.hidden = !box.hidden;
+            if (!box.hidden) $('diySearchInput').focus();
+        };
+        $('diySearchInput').addEventListener('input', function () { state.search = this.value.trim(); renderGrid(); });
+        $('diySortBtn').onclick = function () { state.sortAsc = !state.sortAsc; renderGrid(); };
+        function showModal(title, text) {
+            $('diyModalTitle').textContent = title;
+            $('diyModalText').textContent = text;
+            $('diyModal').hidden = false;
+        }
+        $('diySave').onclick = function () {
+            var n = state.beads.length;
+            showModal('已保存', n ? ('你的设计已暂存（共 ' + n + ' 件水晶）。') : '尚未添加水晶，请先添加。');
+        };
+        $('diyComplete').onclick = function () {
+            var c = calc();
+            showModal('设计完成', '你的专属装饰窗共 ' + c.count + ' 件水晶，总价 ' + money(c.price) + '。');
+        };
+        $('diyModalClose').onclick = function () { $('diyModal').hidden = true; };
+        $('diyModal').addEventListener('click', function (e) { if (e.target === this) this.hidden = true; });
+
+        /* ---- 响应式重绘 ---- */
+        window.addEventListener('resize', renderPreview);
+        window.addEventListener('load', renderPreview);
+
+        /* ---- 初始化 ---- */
+        renderTabs();
+        renderColors();
+        renderGrid();
+        renderPreview();
+        updateTotals();
+    })();
+    </script>
+
+    <!-- ============ 全站统一页脚 ============ -->
+    <footer class="bg-neutral-900 text-white pt-16 pb-8">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+                <div class="col-span-2 md:col-span-1">
+                    <div class="flex items-center gap-2 text-2xl font-bold mb-5"><img src="images/logo.jpg" alt="LuminaGems" class="w-9 h-9 rounded-full object-cover"> LuminaGems</div>
+                    <p class="text-neutral-400 mb-6 text-sm leading-relaxed">Blending Eastern crystal aesthetics with emotional healing and pet companionship — bringing balance, protection, and alignment to your life.</p>
+                    <div class="flex space-x-4">
+                        <a href="#" aria-label="Instagram" class="w-9 h-9 rounded-full bg-neutral-800 flex items-center justify-center hover:bg-primary transition-colors"><i class="fa fa-instagram"></i></a>
+                        <a href="#" aria-label="Pinterest" class="w-9 h-9 rounded-full bg-neutral-800 flex items-center justify-center hover:bg-primary transition-colors"><i class="fa fa-pinterest"></i></a>
+                        <a href="#" aria-label="Facebook" class="w-9 h-9 rounded-full bg-neutral-800 flex items-center justify-center hover:bg-primary transition-colors"><i class="fa fa-facebook"></i></a>
+                        <a href="#" aria-label="TikTok" class="w-9 h-9 rounded-full bg-neutral-800 flex items-center justify-center hover:bg-primary transition-colors"><i class="fa fa-music"></i></a>
+                    </div>
+                </div>
+                <div><h4 class="text-lg font-semibold mb-5">Shop</h4><ul class="space-y-3 text-sm">
+                    <li><a href="products.html" class="text-neutral-400 hover:text-white transition-colors">All Crystals</a></li>
+                    <li><a href="products.html" class="text-neutral-400 hover:text-white transition-colors">Core Series</a></li>
+                    <li><a href="diy.html" class="text-neutral-400 hover:text-white transition-colors">Design Your Own</a></li>
+                    <li><a href="products.html" class="text-neutral-400 hover:text-white transition-colors">Pet Friendly</a></li>
+                    <li><a href="cart.html" class="text-neutral-400 hover:text-white transition-colors">Shopping Cart</a></li>
+                </ul></div>
+                <div><h4 class="text-lg font-semibold mb-5">Resources</h4><ul class="space-y-3 text-sm">
+                    <li><a href="blog.html" class="text-neutral-400 hover:text-white transition-colors">Blog</a></li>
+                    <li><a href="resources.html" class="text-neutral-400 hover:text-white transition-colors">Free Guides</a></li>
+                    <li><a href="our-story.html" class="text-neutral-400 hover:text-white transition-colors">Our Story</a></li>
+                    <li><a href="our-values.html" class="text-neutral-400 hover:text-white transition-colors">Our Values</a></li>
+                    <li><a href="faq.html" class="text-neutral-400 hover:text-white transition-colors">FAQ</a></li>
+                    <li><a href="contact.html" class="text-neutral-400 hover:text-white transition-colors">Contact Us</a></li>
+                </ul></div>
+                <div><h4 class="text-lg font-semibold mb-5">Customer Service</h4><ul class="space-y-3 text-sm">
+                    <li><a href="faq.html" class="text-neutral-400 hover:text-white transition-colors">Shipping Policy</a></li>
+                    <li><a href="faq.html" class="text-neutral-400 hover:text-white transition-colors">Return Policy</a></li>
+                    <li><a href="account.html" class="text-neutral-400 hover:text-white transition-colors">Track Order</a></li>
+                    <li><a href="account.html" class="text-neutral-400 hover:text-white transition-colors">My Account</a></li>
+                    <li><a href="contact.html" class="text-neutral-400 hover:text-white transition-colors">Support Center</a></li>
+                </ul></div>
+            </div>
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4 py-6 border-t border-neutral-800">
+                <div class="flex items-center gap-3 text-neutral-400 text-sm">
+                    <i class="fa fa-truck text-primary"></i><span>Insured global shipping</span>
+                    <span class="mx-2 text-neutral-700">|</span><span>We accept</span>
+                    <i class="fa fa-cc-visa text-2xl text-neutral-300"></i><i class="fa fa-cc-mastercard text-2xl text-neutral-300"></i><i class="fa fa-paypal text-2xl text-neutral-300"></i>
+                </div>
+                <div class="flex gap-4 text-xs text-neutral-500">
+                    <a href="faq.html" class="hover:text-white transition-colors">Privacy Policy</a>
+                    <a href="faq.html" class="hover:text-white transition-colors">Terms of Service</a>
+                </div>
+            </div>
+            <div class="border-t border-neutral-800 pt-6 text-center text-neutral-500 text-sm"><p>&copy; 2026 LuminaGems. All rights reserved. Crafted with intention.</p></div>
+        </div>
+    </footer>
+
+    <!-- 悬浮组件 -->
+    <button id="backToTop" class="back-to-top" aria-label="Back to top"><i class="fa fa-chevron-up"></i></button>
+    <!-- Gemly AI 触发按钮 -->
+    <button id="openGemlyAiBtn" class="agent-fab" aria-label="Chat with Crystal Soul" title="与Crystal Soul（晶灵）对话">
+        <i class="fa fa-comments text-xl"></i>
+    </button>
+
+    <!-- ============ Gemly AI 对话抽屉组件（自研樱花粉白主题·不嵌入任何第三方页面） ============ -->
+    <aside id="gemlyDrawer" class="gemly-drawer" aria-hidden="true" role="dialog" aria-label="Gemly AI Crystal Advisor">
+        <!-- 顶部标题栏 60px -->
+        <header class="gemly-header">
+            <div class="gemly-header-info">
+                <span class="gemly-header-icon"><i class="fa fa-gem"></i></span>
+                <div class="min-w-0">
+                    <h3 class="gemly-header-title">Gemly AI · Crystal Advisor</h3>
+                    <p class="gemly-header-sub">Crystal Soul｜人宠晶石疗愈顾问</p>
+                </div>
+            </div>
+            <div class="gemly-header-actions">
+                <button id="gemlyDrawerHide" class="gemly-icon-btn" aria-label="收起" title="收起"><i class="fa fa-angle-right"></i></button>
+                <button id="gemlyDrawerClose" class="gemly-icon-btn" aria-label="关闭" title="关闭"><i class="fa fa-times"></i></button>
+            </div>
+        </header>
+
+        <!-- 对话滚动容器 -->
+        <div id="gemlyChatBody" class="gemly-chat-body"></div>
+
+        <!-- 底部输入栏 72px -->
+        <footer class="gemly-input-bar">
+            <input id="gemlyInput" type="text" class="gemly-input" placeholder="给晶灵留言，回车发送…" autocomplete="off" maxlength="500">
+            <button id="gemlySendBtn" class="gemly-send-btn" aria-label="发送"><i class="fa fa-paper-plane"></i></button>
+        </footer>
+    </aside>
+    <!-- 抽屉遮罩(仅移动端点击关闭,PC端透明不阻挡主体浏览) -->
+    <div id="gemlyDrawerBackdrop" class="gemly-drawer-backdrop" aria-hidden="true"></div>
+
+    <style>
+        /* === Gemly AI 樱花粉白主题 === */
+        .gemly-drawer {
+            position: fixed; top: 0; right: 0; bottom: 0;
+            width: 420px; max-width: 100vw; height: 100vh;
+            background: #FFF8FA;            /* 粉白底色 */
+            z-index: 10000;
+            transform: translateX(100%);
+            display: flex; flex-direction: column;
+            box-shadow: -12px 0 40px rgba(255, 182, 193, 0.22);
+            will-change: transform;
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+        .gemly-drawer.open { transform: translateX(0); }
+
+        /* 顶部标题栏 60px */
+        .gemly-header {
+            height: 60px; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 12px; padding: 0 16px;
+            background: linear-gradient(180deg, #FFF0F5 0%, #FFE6EF 100%);
+            border-bottom: 1px solid #FFE0EC;
+        }
+        .gemly-header-info { display: flex; align-items: center; gap: 10px; min-width: 0; }
+        .gemly-header-icon {
+            width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
+            background: linear-gradient(135deg, #FFD1DC 0%, #FFB6C1 100%);
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 14px;
+            box-shadow: 0 4px 12px rgba(255, 209, 220, 0.5);
+        }
+        .gemly-header-title { font-size: 14px; font-weight: 600; color: #222222; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .gemly-header-sub { font-size: 11px; color: #8a7079; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .gemly-header-actions { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+        .gemly-icon-btn {
+            width: 32px; height: 32px; border-radius: 10px;
+            display: inline-flex; align-items: center; justify-content: center;
+            color: #8a7079; background: transparent; border: none; cursor: pointer; font-size: 15px;
+            transition: background .2s ease, color .2s ease;
+        }
+        .gemly-icon-btn:hover { background: #FFD1DC; color: #fff; }
+
+        /* 对话滚动区 */
+        .gemly-chat-body {
+            flex: 1 1 0%; min-height: 0; overflow-y: auto; overflow-x: hidden;
+            padding: 18px 16px; display: flex; flex-direction: column; gap: 16px;
+        }
+        .gemly-chat-body::-webkit-scrollbar { width: 6px; }
+        .gemly-chat-body::-webkit-scrollbar-thumb { background: #FFD1DC; border-radius: 6px; }
+        .gemly-chat-body::-webkit-scrollbar-track { background: transparent; }
+
+        /* 消息行 */
+        .gemly-msg { display: flex; gap: 8px; max-width: 92%; }
+        .gemly-msg-ai { align-self: flex-start; }
+        .gemly-msg-user { align-self: flex-end; flex-direction: row-reverse; }
+
+        /* 头像 */
+        .gemly-avatar { width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center; font-size: 13px; }
+        .gemly-avatar-ai { background: linear-gradient(135deg, #FFD1DC 0%, #FFB6C1 100%); color: #fff; box-shadow: 0 2px 8px rgba(255, 209, 220, 0.5); }
+        .gemly-avatar-user { background: #fff; color: #FFB6C1; border: 1.5px solid #FFD1DC; }
+
+        /* 气泡 */
+        .gemly-bubble { padding: 10px 14px; font-size: 13.5px; line-height: 1.6; word-break: break-word; }
+        .gemly-bubble-ai { background: #FFFFFF; color: #444444; border: 1px solid #FFE0EC; border-radius: 4px 14px 14px 14px; box-shadow: 0 2px 10px rgba(255, 182, 193, 0.1); }
+        .gemly-bubble-user { background: #FFD1DC; color: #5a3a42; border-radius: 14px 4px 14px 14px; box-shadow: 0 2px 10px rgba(255, 209, 220, 0.35); }
+
+        /* loading 三点动画 */
+        .gemly-typing { display: inline-flex; gap: 4px; padding: 4px 2px; }
+        .gemly-typing span { width: 7px; height: 7px; border-radius: 50%; background: #FFB6C1; animation: gemlyBlink 1.2s infinite ease-in-out both; }
+        .gemly-typing span:nth-child(2) { animation-delay: .2s; }
+        .gemly-typing span:nth-child(3) { animation-delay: .4s; }
+        @keyframes gemlyBlink { 0%, 80%, 100% { opacity: .3; transform: scale(.8); } 40% { opacity: 1; transform: scale(1); } }
+
+        /* 底部输入栏 72px */
+        .gemly-input-bar {
+            height: 72px; flex-shrink: 0; padding: 12px 14px;
+            display: flex; align-items: center; gap: 10px;
+            background: #FFFFFF; border-top: 1px solid #FFE0EC;
+        }
+        .gemly-input {
+            flex: 1; height: 44px; border-radius: 22px; border: 1.5px solid #FFE0EC;
+            padding: 0 18px; font-size: 14px; color: #444444; background: #FFF8FA;
+            outline: none; transition: border-color .2s ease, box-shadow .2s ease;
+        }
+        .gemly-input::placeholder { color: #c9a8b2; }
+        .gemly-input:focus { border-color: #FFD1DC; box-shadow: 0 0 0 3px rgba(255, 209, 220, 0.25); background: #fff; }
+        .gemly-send-btn {
+            width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0;
+            background: linear-gradient(135deg, #FFD1DC 0%, #FFB6C1 100%); color: #fff;
+            border: none; cursor: pointer; font-size: 15px;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 12px rgba(255, 209, 220, 0.5);
+            transition: transform .2s ease, opacity .2s ease;
+        }
+        .gemly-send-btn:hover { transform: scale(1.08); }
+        .gemly-send-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+
+        /* 遮罩:PC透明不阻挡,移动端半透明可点击关闭 */
+        .gemly-drawer-backdrop { position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,0); pointer-events: none; transition: background .35s ease; }
+        .gemly-drawer-backdrop.show { background: rgba(34, 34, 34, 0.25); }
+        @media (max-width: 640px) {
+            .gemly-drawer { width: 100vw; }
+            .gemly-drawer-backdrop.show { background: rgba(34, 34, 34, 0.4); pointer-events: auto; }
+        }
+        .agent-fab.drawer-active { transform: scale(.92); opacity: .8; }
+    </style>
+
+    <script>
+    /* === Gemly AI 对话抽屉逻辑(自执行,不污染全局) === */
+    (function () {
+        /* ========= 配置区(上线前必读) ========= */
+        // ① 演示模式开关：true=本地模拟回复(仅调试用,禁止上线)；false=走后端代理调用真实AI
+        //    ⚠️ 上线前必须改为 false,否则用户收到的都是模拟文案,且无法对接智能体
+        var GEMLY_DEMO_MODE = true;
+
+        // ② 后端代理接口地址(演示模式关闭后生效)
+        //    ⚠️ ①需要后端实现的代理接口地址位置：该接口由你的后端服务实现,
+        //       后端在此接口内携带 Coze PAT 令牌 + agent_id 转发请求到 Coze 开放API,
+        //       响应需返回 JSON: { "reply": "AI回复文本" }
+        //    请求体示例(前端发给后端): { "agent_id": "...", "message": "用户输入", "history": [...] }
+        var GEMLY_PROXY_URL = '/api/gemly-chat';
+
+        // ③ Coze agent_id(智能体ID,可放前端；PAT个人访问令牌严禁写前端,只能放后端)
+        //    ⚠️ ②需要填写的Coze agent_id：在Coze平台智能体详情页获取,填入下方引号内
+        var GEMLY_AGENT_ID = '';
+        /* ========= 配置区结束 ========= */
+
+        var drawer = document.getElementById('gemlyDrawer');
+        var backdrop = document.getElementById('gemlyDrawerBackdrop');
+        var openBtn = document.getElementById('openGemlyAiBtn');
+        var closeBtn = document.getElementById('gemlyDrawerClose');
+        var hideBtn = document.getElementById('gemlyDrawerHide');
+        var chatBody = document.getElementById('gemlyChatBody');
+        var input = document.getElementById('gemlyInput');
+        var sendBtn = document.getElementById('gemlySendBtn');
+        if (!drawer || !openBtn || !chatBody) return;
+
+        var animTimer = null;
+        var isSending = false;
+        var history = []; // 对话历史仅存内存,刷新清空
+
+        /* --- 滑入滑出动画(JS驱动,规避部分环境 transition 失效) --- */
+        function slide(toOpen) {
+            if (animTimer) { clearTimeout(animTimer); animTimer = null; }
+            var width = drawer.offsetWidth;
+            var t = drawer.style.transform || '';
+            var m = t.match(/translateX\(([-\d.]+)px\)/);
+            var start = m ? parseFloat(m[1]) : (toOpen ? width : 0);
+            var end = toOpen ? 0 : width;
+            drawer.style.transform = 'translateX(' + start + 'px)';
+            var duration = 350, t0 = Date.now();
+            function ease(p) { return p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2; }
+            (function step() {
+                var p = Math.min((Date.now() - t0) / duration, 1);
+                drawer.style.transform = 'translateX(' + (start + (end - start) * ease(p)) + 'px)';
+                if (p < 1) { animTimer = setTimeout(step, 16); }
+                else { drawer.style.transform = ''; animTimer = null; }
+            })();
+        }
+        function openDrawer() {
+            drawer.classList.add('open');
+            drawer.setAttribute('aria-hidden', 'false');
+            backdrop.classList.add('show');
+            openBtn.classList.add('drawer-active');
+            document.body.style.overflow = 'hidden';
+            slide(true);
+            if (!chatBody.hasChildNodes()) addAiMessage('Hi, I\'m Crystal Soul 💎 Your sanctuary for crystal healing & pet companionship. How may I guide your journey today?');
+            setTimeout(function () { input && input.focus(); }, 360);
+        }
+        function closeDrawer() {
+            drawer.classList.remove('open');
+            drawer.setAttribute('aria-hidden', 'true');
+            backdrop.classList.remove('show');
+            openBtn.classList.remove('drawer-active');
+            document.body.style.overflow = '';
+            slide(false);
+        }
+        openBtn.addEventListener('click', openDrawer);
+        if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
+        if (hideBtn) hideBtn.addEventListener('click', closeDrawer);
+        if (backdrop) backdrop.addEventListener('click', closeDrawer);
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && drawer.classList.contains('open')) closeDrawer();
+        });
+
+        /* --- 消息渲染 --- */
+        function scrollBottom() { chatBody.scrollTop = chatBody.scrollHeight; }
+        function addUserMessage(text) {
+            var row = document.createElement('div');
+            row.className = 'gemly-msg gemly-msg-user';
+            row.innerHTML = '<div class="gemly-avatar gemly-avatar-user"><i class="fa fa-user"></i></div><div class="gemly-bubble gemly-bubble-user"></div>';
+            row.querySelector('.gemly-bubble').textContent = text;
+            chatBody.appendChild(row);
+            scrollBottom();
+        }
+        function addAiMessage(text) {
+            var row = document.createElement('div');
+            row.className = 'gemly-msg gemly-msg-ai';
+            row.innerHTML = '<div class="gemly-avatar gemly-avatar-ai"><i class="fa fa-gem"></i></div><div class="gemly-bubble gemly-bubble-ai"></div>';
+            row.querySelector('.gemly-bubble').textContent = text;
+            chatBody.appendChild(row);
+            scrollBottom();
+        }
+        function showTyping() {
+            var row = document.createElement('div');
+            row.className = 'gemly-msg gemly-msg-ai gemly-typing-row';
+            row.innerHTML = '<div class="gemly-avatar gemly-avatar-ai"><i class="fa fa-gem"></i></div><div class="gemly-bubble gemly-bubble-ai"><span class="gemly-typing"><span></span><span></span><span></span></span></div>';
+            chatBody.appendChild(row);
+            scrollBottom();
+            return row;
+        }
+
+        /* --- 发送 --- */
+        function send() {
+            var text = (input.value || '').trim();
+            if (!text || isSending) return;
+            isSending = true;
+            sendBtn.disabled = true;
+            input.value = '';
+            addUserMessage(text);
+            history.push({ role: 'user', content: text });
+            var typing = showTyping();
+
+            if (GEMLY_DEMO_MODE) {
+                // ⚠️ 演示模式:本地模拟回复,仅本地调试用,禁止上线
+                var replies = [
+                    'Crystals carry ancient calm. Amethyst soothes anxiety, while rose quartz opens the heart. Which energy calls to you?',
+                    'For your pet companion, try placing a gentle rose quartz near their resting spot — it radiates love and safety.',
+                    'Every LuminaGems piece is ethically sourced and energy-cleansed. Your crystal chooses you as much as you choose it.',
+                    'Take a deep breath. Hold your crystal, set an intention, and let its frequency align with yours.',
+                    'Crystal Soul is here for you. Tell me more about what your heart or your pet needs today.'
+                ];
+                setTimeout(function () {
+                    typing.remove();
+                    var r = replies[Math.floor(Math.random() * replies.length)];
+                    addAiMessage(r);
+                    history.push({ role: 'assistant', content: r });
+                    isSending = false;
+                    sendBtn.disabled = false;
+                    input.focus();
+                }, 900 + Math.random() * 700);
+            } else {
+                // 真实模式:调用后端代理接口(后端携带PAT令牌转发到Coze API)
+                fetch(GEMLY_PROXY_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ agent_id: GEMLY_AGENT_ID, message: text, history: history })
+                }).then(function (res) {
+                    if (!res.ok) throw new Error('HTTP ' + res.status);
+                    return res.json();
+                }).then(function (data) {
+                    typing.remove();
+                    var reply = (data && data.reply) ? data.reply : 'Sorry, Crystal Soul is resting. Please try again later.';
+                    addAiMessage(reply);
+                    history.push({ role: 'assistant', content: reply });
+                }).catch(function (err) {
+                    typing.remove();
+                    addAiMessage('Network hiccup — please check your connection and try again. ✨');
+                }).then(function () {
+                    isSending = false;
+                    sendBtn.disabled = false;
+                    input.focus();
+                });
+            }
+        }
+        if (sendBtn) sendBtn.addEventListener('click', send);
+        if (input) input.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+        });
+    })();
+    </script>
+    <!-- ============ /Gemly AI 对话抽屉组件 ============ -->
+</body>
+</html>

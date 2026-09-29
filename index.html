@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LuminaGems — Your Sacred Haven of Crystal Healing & Pet Companionship</title>
+    <meta name="description" content="LuminaGems blends Eastern crystal aesthetics with emotional healing and pet companionship. Ethically sourced crystals, healing energy, pet friendly, global shipping.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="font/iconfont.css">
+    <script>
+        // 全站统一设计令牌：色彩、字体、容器最大宽度均在 tailwind.config 集中定义
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6B4E2E',      // 紫色主调（水晶能量感）
+                        secondary: '#C9A227',    // 橙色点缀（活力感）
+                        neutral: {
+                            100: '#FAF6F0',
+                            200: '#E8E0D4',
+                            300: '#D6CCBE',
+                            600: '#5C4A38',
+                            700: '#4A3B2C',
+                            800: '#3A2C1E',
+                            900: '#2A1F14'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    container: {
+                        center: true,
+                        padding: { DEFAULT: '1rem', sm: '1.5rem', lg: '2rem' },
+                        screens: { lg: '1200px', xl: '1200px' }
+                    },
+                    boxShadow: {
+                        soft: '0 4px 24px rgba(107, 78, 46, 0.08)',
+                        card: '0 8px 30px rgba(42, 31, 20, 0.06)'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* 全局基础样式：仅重置盒模型，字体交由 Tailwind Inter 配置生效 */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Inter', system-ui, sans-serif; }
+
+        /* 文字阴影（用于 Hero 等深色背景上的白色文字） */
+        .text-shadow { text-shadow: 0 2px 24px rgba(0, 0, 0, 0.55); }
+
+        /* 标题装饰横线 */
+        .section-title { position: relative; display: inline-block; }
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 64px; height: 3px;
+            background: linear-gradient(90deg, #6B4E2E, #C9A227);
+            border-radius: 2px;
+            margin: 14px auto 0;
+        }
+
+        /* 卡片悬浮微交互 */
+        .hover-lift { transition: transform .35s ease, box-shadow .35s ease; }
+        .hover-lift:hover { transform: translateY(-6px); box-shadow: 0 16px 40px rgba(42, 31, 20, 0.12); }
+
+        /* 图片容器固定宽高比占位，防止布局偏移 */
+        .aspect-card { aspect-ratio: 4 / 5; }
+        .aspect-wide  { aspect-ratio: 16 / 9; }
+        .aspect-square-img { aspect-ratio: 1 / 1; }
+
+        /* 智能体悬浮按钮：完全脱离文档流，最高层级，不挤压页面内容 */
+        .agent-fab {
+            position: fixed; right: 24px; bottom: 24px; z-index: 9999;
+            width: 58px; height: 58px; border-radius: 9999px;
+            background: linear-gradient(135deg, #6B4E2E, #4E3620);
+            color: #fff; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 8px 24px rgba(107, 78, 46, 0.45);
+            cursor: pointer; transition: transform .25s ease, box-shadow .25s ease;
+            border: none;
+        }
+        .agent-fab:hover { transform: scale(1.08); box-shadow: 0 12px 32px rgba(107, 78, 46, 0.6); }
+
+        /* 回到顶部按钮：智能体上方，同样脱离文档流 */
+        .back-to-top {
+            position: fixed; right: 24px; bottom: 96px; z-index: 9998;
+            width: 46px; height: 46px; border-radius: 9999px;
+            background: rgba(58, 44, 30, 0.85); color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 6px 18px rgba(42, 31, 20, 0.25);
+            cursor: pointer; transition: opacity .3s ease, transform .3s ease;
+            opacity: 0; pointer-events: none; border: none;
+        }
+        .back-to-top.visible { opacity: 1; pointer-events: auto; }
+        .back-to-top:hover { transform: translateY(-3px); background: #3A2C1E; }
+
+        /* Cookie 同意弹窗：底部横幅，脱离文档流 */
+        .cookie-banner {
+            position: fixed; left: 0; right: 0; bottom: 0; z-index: 9997;
+            background: #2A1F14; color: #E8E0D4;
+            transform: translateY(100%); transition: transform .4s ease;
+        }
+        .cookie-banner.show { transform: translateY(0); }
+
+        /* 搜索面板（全屏覆盖式，脱离文档流） */
+        .search-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 9996; background: rgba(42,31,20,0.6); backdrop-filter: blur(4px); opacity: 0; pointer-events: none; transition: opacity .3s ease; }
+        .search-overlay.active { opacity: 1; pointer-events: auto; }
+        .search-panel { max-width: 640px; margin: 120px auto 0; background: #fff; border-radius: 24px; padding: 32px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); transform: translateY(-20px); transition: transform .3s ease; }
+        .search-overlay.active .search-panel { transform: translateY(0); }
+
+        /* 多语言下拉菜单（脱离文档流） */
+        .lang-dropdown { position: absolute; top: calc(100% + 8px); right: 0; min-width: 140px; background: #fff; border-radius: 12px; box-shadow: 0 8px 30px rgba(42,31,20,0.12); padding: 6px; z-index: 100; opacity: 0; pointer-events: none; transform: translateY(-4px); transition: all .2s ease; }
+        .lang-dropdown.show { opacity: 1; pointer-events: auto; transform: translateY(0); }
+        .lang-option { display: block; width: 100%; text-align: left; padding: 8px 12px; border-radius: 8px; font-size: 14px; color: #4A3B2C; background: transparent; border: none; cursor: pointer; transition: background .15s ease; }
+        .lang-option:hover { background: #FAF6F0; }
+        .lang-option.active { background: #F5EBD8; color: #6B4E2E; font-weight: 600; }
+    </style>
+</head>
+<body class="font-sans text-neutral-800 bg-white">
+
+    <!-- ============ 统一顶部导航 ============ -->
+    <header id="navbar" class="fixed w-full top-0 z-50 transition-all duration-300 bg-transparent">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <!-- Logo -->
+                <a href="index.html" class="flex items-center gap-2 text-2xl font-bold text-white text-shadow">
+                    <img src="images/logo.jpg" alt="LuminaGems" class="w-9 h-9 rounded-full object-cover ring-2 ring-white/40">
+                    LuminaGems
+                </a>
+
+                <!-- 桌面端主导航 -->
+                <nav class="hidden lg:flex items-center gap-8 text-sm font-medium tracking-wide">
+                    <a href="index.html" class="text-white hover:text-secondary transition-colors">Home</a>
+                    <a href="products.html" class="text-white hover:text-secondary transition-colors">Shop</a>
+                    <a href="our-story.html" class="text-white hover:text-secondary transition-colors">Our Story</a>
+                    <a href="our-values.html" class="text-white hover:text-secondary transition-colors">Our Values</a>
+                    <a href="blog.html" class="text-white hover:text-secondary transition-colors">Blog</a>
+                    <a href="resources.html" class="text-white hover:text-secondary transition-colors">Resources</a>
+                </nav>
+
+                <!-- 右侧功能区 -->
+                <div class="flex items-center gap-5 text-white">
+                    <button id="searchBtn" aria-label="Search" class="hover:text-secondary transition-colors hidden sm:block"><i class="fa fa-search text-lg"></i></button><div class="relative hidden md:block"><button id="langToggle" class="flex items-center gap-1.5 text-sm hover:text-secondary transition-colors cursor-pointer"><i class="fa fa-globe"></i><span id="langCurrent">EN</span><i class="fa fa-caret-down text-xs"></i></button><div id="langMenu" class="lang-dropdown"><button data-lang="EN" class="lang-option active">English</button><button data-lang="ZH" class="lang-option">中文</button><button data-lang="JA" class="lang-option">日本語</button></div></div>
+                    <a href="account.html" aria-label="Wishlist" class="hover:text-secondary transition-colors hidden sm:block"><i class="fa fa-heart-o text-lg"></i></a>
+                    <a href="cart.html" aria-label="Cart" class="relative hover:text-secondary transition-colors">
+                        <i class="fa fa-shopping-bag text-lg"></i>
+                        <span class="absolute -top-2 -right-2 bg-secondary text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">2</span>
+                    </a>
+                    
+                    <a href="zuce.html" aria-label="Account" class="hover:text-secondary transition-colors">
+                        <i class="iconfont icon-denglu" style="font-size:22px;"></i>
+                    </a>
+                    <button id="menu-toggle" class="lg:hidden hover:text-secondary transition-colors" aria-label="Menu">
+                        <i class="fa fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 移动端导航菜单 -->
+        <div id="mobile-menu" class="hidden lg:hidden bg-white shadow-lg absolute w-full">
+            <div class="container mx-auto px-4 py-4 flex flex-col space-y-1 text-neutral-800">
+                <a href="index.html" class="py-2.5 hover:text-primary transition-colors border-b border-neutral-100">Home</a>
+                <a href="products.html" class="py-2.5 hover:text-primary transition-colors border-b border-neutral-100">Shop</a>
+                <a href="our-story.html" class="py-2.5 hover:text-primary transition-colors border-b border-neutral-100">Our Story</a>
+                <a href="our-values.html" class="py-2.5 hover:text-primary transition-colors border-b border-neutral-100">Our Values</a>
+                <a href="blog.html" class="py-2.5 hover:text-primary transition-colors border-b border-neutral-100">Blog</a>
+                <a href="resources.html" class="py-2.5 hover:text-primary transition-colors border-b border-neutral-100">Resources</a>
+                <a href="diy.html" class="py-2.5 hover:text-primary transition-colors border-b border-neutral-100">Design Your Own</a>
+                <a href="contact.html" class="py-2.5 hover:text-primary transition-colors">Contact</a>
+            </div>
+        </div>
+        </header>
+
+    <!-- 搜索面板（全屏覆盖式，脱离文档流） -->
+    <div id="searchOverlay" class="search-overlay">
+        <div class="search-panel">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-semibold text-neutral-900">Search LuminaGems</h3>
+                <button id="searchClose" class="text-neutral-400 hover:text-neutral-700 transition-colors" aria-label="Close search"><i class="fa fa-times text-2xl"></i></button>
+            </div>
+            <form id="searchForm" class="relative">
+                <i class="fa fa-search absolute left-5 top-1/2 -translate-y-1/2 text-neutral-400"></i>
+                <input id="searchInput" type="text" placeholder="Search crystals, healing guides, blog..." class="w-full pl-12 pr-4 py-4 border border-neutral-200 rounded-full text-base focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+            </form>
+            <div class="mt-6">
+                <p class="text-sm text-neutral-500 mb-3">Popular Searches</p>
+                <div class="flex flex-wrap gap-2">
+                    <a href="products.html?q=amethyst" class="px-4 py-2 bg-neutral-100 hover:bg-primary hover:text-white rounded-full text-sm transition-colors">Amethyst</a>
+                    <a href="products.html?q=rose+quartz" class="px-4 py-2 bg-neutral-100 hover:bg-primary hover:text-white rounded-full text-sm transition-colors">Rose Quartz</a>
+                    <a href="products.html?q=pet+friendly" class="px-4 py-2 bg-neutral-100 hover:bg-primary hover:text-white rounded-full text-sm transition-colors">Pet Friendly</a>
+                    <a href="blog.html" class="px-4 py-2 bg-neutral-100 hover:bg-primary hover:text-white rounded-full text-sm transition-colors">Meditation Guide</a>
+                    <a href="products.html?q=healing+gift" class="px-4 py-2 bg-neutral-100 hover:bg-primary hover:text-white rounded-full text-sm transition-colors">Healing Gift</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ ① Hero 首屏 ============ -->
+    <section class="relative h-screen min-h-[600px] flex items-center justify-center overflow-hidden">
+        <div class="absolute inset-0 z-0">
+            <img src="new_pics/新的落地页.png" alt="LuminaGems crystal botanical collection" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-gradient-to-b from-neutral-900/40 via-neutral-900/30 to-neutral-900/60"></div>
+        </div>
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+            <p class="text-secondary font-medium tracking-[0.3em] uppercase text-sm mb-5">Handcrafted Crystal · Botanical Inspired · Healing Energy</p>
+            <h1 class="text-[clamp(2.5rem,7vw,5rem)] font-extrabold text-white leading-[1.05] mb-6 text-shadow">
+                CRYSTAL BOTANICAL COLLECTION
+            </h1>
+            <p class="text-lg md:text-xl text-white/90 max-w-2xl mx-auto mb-9 text-shadow">
+                Ethically sourced crystals crafted to calm the mind, uplift the spirit, and accompany every soul — including your beloved pets.
+            </p>
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <a href="products.html" class="bg-secondary hover:bg-secondary/90 text-white font-semibold px-9 py-3.5 rounded-full transition-all hover:shadow-lg hover:shadow-secondary/40">
+                    Shop The Collection
+                </a>
+                <a href="diy.html" class="bg-primary hover:bg-primary/90 text-white font-semibold px-9 py-3.5 rounded-full transition-all hover:shadow-lg hover:shadow-primary/40">
+                    <i class="fa fa-gem mr-1"></i> Design Your Own
+                </a>
+                <a href="our-story.html" class="bg-transparent border-2 border-white text-white font-semibold px-9 py-3.5 rounded-full transition-all hover:bg-white/10 backdrop-blur-sm">
+                    Discover Our Story
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ ② 核心价值亮点区（4格） ============ -->
+    <section class="py-20 bg-white">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 text-center">
+                <div class="p-6 rounded-2xl hover-lift bg-neutral-100">
+                    <div class="w-14 h-14 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
+                        <i class="fa fa-leaf text-primary text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">Ethically Sourced</h3>
+                    <p class="text-sm text-neutral-600">Every crystal is traceably sourced from trusted miners who honor the earth.</p>
+                </div>
+                <div class="p-6 rounded-2xl hover-lift bg-neutral-100">
+                    <div class="w-14 h-14 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
+                        <i class="fa fa-heart text-primary text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">Healing Energy</h3>
+                    <p class="text-sm text-neutral-600">Cleansed and charged to support emotional balance and mindful living.</p>
+                </div>
+                <div class="p-6 rounded-2xl hover-lift bg-neutral-100">
+                    <div class="w-14 h-14 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
+                        <i class="fa fa-paw text-primary text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">Pet Friendly</h3>
+                    <p class="text-sm text-neutral-600">Pet-safe stones and companion pieces designed to comfort animals, too.</p>
+                </div>
+                <div class="p-6 rounded-2xl hover-lift bg-neutral-100">
+                    <div class="w-14 h-14 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
+                        <i class="fa fa-globe text-primary text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2">Global Shipping</h3>
+                    <p class="text-sm text-neutral-600">Worldwide delivery with insured tracking on every order over $99.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ ③ 核心系列 ============ -->
+    <section class="py-20 bg-neutral-100" id="core-series">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <p class="text-secondary font-medium tracking-[0.25em] uppercase text-xs mb-3">Signature Lines</p>
+                <h2 class="section-title text-3xl md:text-4xl font-bold text-neutral-900">Core Series</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+                <a href="products.html?series=ArtisVault" class="group relative rounded-2xl overflow-hidden shadow-card hover-lift block">
+                    <div class="aspect-card overflow-hidden">
+                        <img src="./new_pics/morion-black-quartz.jpg" alt="ArtisVault Morion Black Smoky Quartz" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                    </div>
+                    <div class="absolute bottom-5 left-1/2 -translate-x-1/2 bg-white/95 backdrop-blur px-6 py-2.5 rounded-full font-semibold text-neutral-900 shadow-md">ArtisVault</div>
+                </a>
+                <a href="products.html?series=Lumina" class="group relative rounded-2xl overflow-hidden shadow-card hover-lift block">
+                    <div class="aspect-card overflow-hidden">
+                        <img src="./new_pics/rose-quartz.jpg" alt="Lumina Rose Quartz" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                    </div>
+                    <div class="absolute bottom-5 left-1/2 -translate-x-1/2 bg-white/95 backdrop-blur px-6 py-2.5 rounded-full font-semibold text-neutral-900 shadow-md">Lumina</div>
+                </a>
+                <a href="products.html?series=TerraSeek" class="group relative rounded-2xl overflow-hidden shadow-card hover-lift block">
+                    <div class="aspect-card overflow-hidden">
+                        <img src="./new_pics/fluorite-point.jpg" alt="TerraSeek Fluorite Point" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                    </div>
+                    <div class="absolute bottom-5 left-1/2 -translate-x-1/2 bg-white/95 backdrop-blur px-6 py-2.5 rounded-full font-semibold text-neutral-900 shadow-md">TerraSeek</div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ ③ 能量分类（Shop by Energy） ============ -->
+    <section id="shop-by-energy" class="py-20 bg-white">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <p class="text-secondary font-medium tracking-[0.25em] uppercase text-xs mb-3">Find Your Intention</p>
+                <h2 class="section-title text-3xl md:text-4xl font-bold text-neutral-900">Shop by Energy</h2>
+            </div>
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+                <a href="products.html" class="bg-white rounded-xl overflow-hidden shadow-card hover-lift block">
+                    <div class="aspect-square-img overflow-hidden"><img src="./new_pics/rose-quartz.jpg" alt="Wellness" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110"></div>
+                    <div class="p-5">
+                        <h3 class="text-lg font-semibold mb-1">Wellness</h3>
+                        <p class="text-sm text-neutral-600 mb-3">Tools to support physical & mental wellbeing</p>
+                        <span class="text-primary font-medium text-sm flex items-center hover:text-primary/80">Shop Now <i class="fa fa-arrow-right ml-2 text-xs"></i></span>
+                    </div>
+                </a>
+                <a href="products.html" class="bg-white rounded-xl overflow-hidden shadow-card hover-lift block">
+                    <div class="aspect-square-img overflow-hidden"><img src="./new_pics/citrine-point.jpg" alt="Wealth" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110"></div>
+                    <div class="p-5">
+                        <h3 class="text-lg font-semibold mb-1">Wealth</h3>
+                        <p class="text-sm text-neutral-600 mb-3">Manifest abundance & prosperity</p>
+                        <span class="text-primary font-medium text-sm flex items-center hover:text-primary/80">Shop Now <i class="fa fa-arrow-right ml-2 text-xs"></i></span>
+                    </div>
+                </a>
+                <a href="products.html" class="bg-white rounded-xl overflow-hidden shadow-card hover-lift block">
+                    <div class="aspect-square-img overflow-hidden"><img src="./new_pics/morion-black-quartz.jpg" alt="Protection" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110"></div>
+                    <div class="p-5">
+                        <h3 class="text-lg font-semibold mb-1">Protection</h3>
+                        <p class="text-sm text-neutral-600 mb-3">Shield your energy from negativity</p>
+                        <span class="text-primary font-medium text-sm flex items-center hover:text-primary/80">Shop Now <i class="fa fa-arrow-right ml-2 text-xs"></i></span>
+                    </div>
+                </a>
+                <a href="products.html" class="bg-white rounded-xl overflow-hidden shadow-card hover-lift block">
+                    <div class="aspect-square-img overflow-hidden"><img src="./new_pics/golden-citrine-point.jpg" alt="Blessedness" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110"></div>
+                    <div class="p-5">
+                        <h3 class="text-lg font-semibold mb-1">Blessedness</h3>
+                        <p class="text-sm text-neutral-600 mb-3">Cultivate self-love & connection</p>
+                        <span class="text-primary font-medium text-sm flex items-center hover:text-primary/80">Shop Now <i class="fa fa-arrow-right ml-2 text-xs"></i></span>
+                    </div>
+                </a>
+                <a href="products.html" class="bg-white rounded-xl overflow-hidden shadow-card hover-lift block">
+                    <div class="aspect-square-img overflow-hidden"><img src="./new_pics/blue-quartz-cluster.png" alt="Calmness" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110"></div>
+                    <div class="p-5">
+                        <h3 class="text-lg font-semibold mb-1">Calmness</h3>
+                        <p class="text-sm text-neutral-600 mb-3">Find peace in life's chaos</p>
+                        <span class="text-primary font-medium text-sm flex items-center hover:text-primary/80">Shop Now <i class="fa fa-arrow-right ml-2 text-xs"></i></span>
+                    </div>
+                </a>
+                <a href="products.html" class="bg-white rounded-xl overflow-hidden shadow-card hover-lift block">
+                    <div class="aspect-square-img overflow-hidden"><img src="./new_pics/fluorite-point.jpg" alt="Wisdom" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110"></div>
+                    <div class="p-5">
+                        <h3 class="text-lg font-semibold mb-1">Wisdom</h3>
+                        <p class="text-sm text-neutral-600 mb-3">Deepen your spiritual connection</p>
+                        <span class="text-primary font-medium text-sm flex items-center hover:text-primary/80">Shop Now <i class="fa fa-arrow-right ml-2 text-xs"></i></span>
+                    </div>
+                </a>
+                <a href="products.html" class="bg-white rounded-xl overflow-hidden shadow-card hover-lift block">
+                    <div class="aspect-square-img overflow-hidden"><img src="./new_pics/smoky-quartz.jpg" alt="Guardian" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110"></div>
+                    <div class="p-5">
+                        <h3 class="text-lg font-semibold mb-1">Guardian</h3>
+                        <p class="text-sm text-neutral-600 mb-3">Tap into your inner strength</p>
+                        <span class="text-primary font-medium text-sm flex items-center hover:text-primary/80">Shop Now <i class="fa fa-arrow-right ml-2 text-xs"></i></span>
+                    </div>
+                </a>
+                <a href="products.html" class="bg-white rounded-xl overflow-hidden shadow-card hover-lift block">
+                    <div class="aspect-square-img overflow-hidden"><img src="./new_pics/clear-quartz-point.jpg" alt="Purifying" class="w-full h-full object-cover transition-transform duration-500 hover:scale-110"></div>
+                    <div class="p-5">
+                        <h3 class="text-lg font-semibold mb-1">Purifying</h3>
+                        <p class="text-sm text-neutral-600 mb-3">Renew yourself day by day</p>
+                        <span class="text-primary font-medium text-sm flex items-center hover:text-primary/80">Shop Now <i class="fa fa-arrow-right ml-2 text-xs"></i></span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ ④ 品牌故事入口区 ============ -->
+    <section class="py-20 bg-neutral-900 text-white">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div class="order-2 lg:order-1">
+                    <p class="text-secondary font-medium tracking-[0.25em] uppercase text-xs mb-4">Our Story</p>
+                    <h2 class="text-3xl md:text-4xl font-bold mb-6 leading-tight">From Ancient Eastern Wisdom to Modern Healing Rituals</h2>
+                    <p class="text-neutral-300 mb-5 leading-relaxed">
+                        LuminaGems was born from a simple belief: that the quiet energy of crystals can create a sanctuary — a haven — wherever you are. Rooted in centuries-old Eastern crystal aesthetics, we pair each stone with intention and care.
+                    </p>
+                    <p class="text-neutral-300 mb-8 leading-relaxed">
+                        From soothing anxiety to comforting anxious pets, our pieces are designed to be lived with, not just worn. Every gem carries a story, and every story begins with you.
+                    </p>
+                    <a href="our-story.html" class="inline-flex items-center gap-2 bg-white text-neutral-900 font-semibold px-8 py-3.5 rounded-full hover:bg-secondary hover:text-white transition-all">
+                        Read Our Full Story <i class="fa fa-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="order-1 lg:order-2">
+                    <div class="aspect-wide rounded-2xl overflow-hidden shadow-2xl">
+                        <img src="new_pics/新的落地页.png" alt="LuminaGems brand story" class="w-full h-full object-cover">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ ⑤ 用户真实故事区 ============ -->
+    <section class="py-20 bg-white">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <p class="text-secondary font-medium tracking-[0.25em] uppercase text-xs mb-3">Real Stories</p>
+                <h2 class="section-title text-3xl md:text-4xl font-bold text-neutral-900">Healing Journeys From Our Community</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-neutral-100 p-8 rounded-2xl hover-lift">
+                    <div class="flex text-secondary mb-4">
+                        <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>
+                    </div>
+                    <p class="text-neutral-700 mb-6 italic leading-relaxed">"My ArtisVault bracelet became my anchor during a rough transition. I reach for it whenever anxiety rises — it feels like a quiet hand on my shoulder."</p>
+                    <div class="flex items-center gap-3">
+                        <img src="images/fen.jpg" alt="Sarah M." class="w-11 h-11 rounded-full object-cover">
+                        <div><h4 class="font-semibold text-sm">Sarah M.</h4><p class="text-neutral-500 text-xs">Austin, TX · ArtisVault Owner</p></div>
+                    </div>
+                </div>
+                <div class="bg-neutral-100 p-8 rounded-2xl hover-lift">
+                    <div class="flex text-secondary mb-4">
+                        <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>
+                    </div>
+                    <p class="text-neutral-700 mb-6 italic leading-relaxed">"I placed a Lumina cluster near my rescue dog's bed. She settles down so much faster now. It's become a peaceful corner for both of us."</p>
+                    <div class="flex items-center gap-3">
+                        <img src="images/bai.jpg" alt="Daniel R." class="w-11 h-11 rounded-full object-cover">
+                        <div><h4 class="font-semibold text-sm">Daniel R.</h4><p class="text-neutral-500 text-xs">London, UK · Pet Companion</p></div>
+                    </div>
+                </div>
+                <div class="bg-neutral-100 p-8 rounded-2xl hover-lift">
+                    <div class="flex text-secondary mb-4">
+                        <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>
+                    </div>
+                    <p class="text-neutral-700 mb-6 italic leading-relaxed">"The TerraSeek piece helped me build a nightly meditation ritual. Three months in, I sleep better and feel more grounded than I have in years."</p>
+                    <div class="flex items-center gap-3">
+                        <img src="images/zi.jpg" alt="Amélie L." class="w-11 h-11 rounded-full object-cover">
+                        <div><h4 class="font-semibold text-sm">Amélie L.</h4><p class="text-neutral-500 text-xs">Lyon, FR · TerraSeek Owner</p></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ ⑥ 博客内容精选区 ============ -->
+    <section class="py-20 bg-neutral-100">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <p class="text-secondary font-medium tracking-[0.25em] uppercase text-xs mb-3">From the Journal</p>
+                <h2 class="section-title text-3xl md:text-4xl font-bold text-neutral-900">Healing Guides & Crystal Stories</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <a href="blog-detail.html" class="bg-white rounded-2xl overflow-hidden shadow-card hover-lift block">
+                    <div class="aspect-wide overflow-hidden"><img src="images/4.jpg" alt="Beginner crystal guide" class="w-full h-full object-cover"></div>
+                    <div class="p-6">
+                        <span class="inline-block text-xs font-medium text-primary bg-primary/10 px-3 py-1 rounded-full mb-3">Crystal Guide</span>
+                        <h3 class="text-lg font-semibold mb-2 leading-snug">Healing Crystals 101: A Beginner's Complete Guide</h3>
+                        <p class="text-sm text-neutral-600 mb-3">Everything you need to know when starting your crystal energy journey.</p>
+                        <span class="text-xs text-neutral-500">May 12, 2026 · 6 min read</span>
+                    </div>
+                </a>
+                <a href="blog-detail.html" class="bg-white rounded-2xl overflow-hidden shadow-card hover-lift block">
+                    <div class="aspect-wide overflow-hidden"><img src="images/5.jpg" alt="Pet calming crystals" class="w-full h-full object-cover"></div>
+                    <div class="p-6">
+                        <span class="inline-block text-xs font-medium text-secondary bg-secondary/10 px-3 py-1 rounded-full mb-3">Pet Care</span>
+                        <h3 class="text-lg font-semibold mb-2 leading-snug">5 Pet-Safe Crystals to Calm Anxious Companions</h3>
+                        <p class="text-sm text-neutral-600 mb-3">Gentle stones that bring peace to your furry family members.</p>
+                        <span class="text-xs text-neutral-500">Jun 03, 2026 · 5 min read</span>
+                    </div>
+                </a>
+                <a href="blog-detail.html" class="bg-white rounded-2xl overflow-hidden shadow-card hover-lift block">
+                    <div class="aspect-wide overflow-hidden"><img src="images/6.jpg" alt="Home crystal placement" class="w-full h-full object-cover"></div>
+                    <div class="p-6">
+                        <span class="inline-block text-xs font-medium text-primary bg-primary/10 px-3 py-1 rounded-full mb-3">Meditation</span>
+                        <h3 class="text-lg font-semibold mb-2 leading-snug">A Room-by-Room Guide to Home Crystal Placement</h3>
+                        <p class="text-sm text-neutral-600 mb-3">Create harmonious energy in every corner of your living space.</p>
+                        <span class="text-xs text-neutral-500">Jul 18, 2026 · 7 min read</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ ⑦ 邮件订阅区 ============ -->
+    <section class="py-20 bg-white">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="max-w-3xl mx-auto text-center">
+                <p class="text-secondary font-medium tracking-[0.25em] uppercase text-xs mb-3">Join the Haven</p>
+                <h2 class="text-3xl md:text-4xl font-bold mb-3 text-neutral-900">Join Our Energy Community</h2>
+                <p class="text-lg text-neutral-600 mb-8">
+                    Get exclusive crystal guides, energy tips, and 10% off your first order delivered to your inbox.
+                </p>
+                <form class="flex flex-col sm:flex-row gap-4 max-w-xl mx-auto" onsubmit="return false;">
+                    <input type="email" placeholder="Enter your email" class="flex-1 px-6 py-3.5 rounded-full border border-neutral-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                    <button type="submit" class="bg-primary hover:bg-primary/90 text-white font-semibold px-8 py-3.5 rounded-full transition-all hover:shadow-lg hover:shadow-primary/40 whitespace-nowrap">
+                        Subscribe Now
+                    </button>
+                </form>
+                <p class="text-xs text-neutral-400 mt-4">By subscribing you agree to our Privacy Policy. Unsubscribe anytime.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 品牌视觉底图 -->
+    <section class="bg-white">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 pb-4">
+            <img src="new_pics/新的落地页.png" alt="LuminaGems sanctuary" class="w-full rounded-2xl object-cover max-h-[360px]">
+        </div>
+    </section>
+
+    <!-- ============ 全站统一页脚 ============ -->
+    <footer class="bg-neutral-900 text-white pt-16 pb-8">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+                <div class="col-span-2 md:col-span-1">
+                    <div class="flex items-center gap-2 text-2xl font-bold mb-5">
+                        <img src="images/logo.jpg" alt="LuminaGems" class="w-9 h-9 rounded-full object-cover">
+                        LuminaGems
+                    </div>
+                    <p class="text-neutral-400 mb-6 text-sm leading-relaxed">
+                        Blending Eastern crystal aesthetics with emotional healing and pet companionship — bringing balance, protection, and alignment to your life.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" aria-label="Instagram" class="w-9 h-9 rounded-full bg-neutral-800 flex items-center justify-center hover:bg-primary transition-colors"><i class="fa fa-instagram"></i></a>
+                        <a href="#" aria-label="Pinterest" class="w-9 h-9 rounded-full bg-neutral-800 flex items-center justify-center hover:bg-primary transition-colors"><i class="fa fa-pinterest"></i></a>
+                        <a href="#" aria-label="Facebook" class="w-9 h-9 rounded-full bg-neutral-800 flex items-center justify-center hover:bg-primary transition-colors"><i class="fa fa-facebook"></i></a>
+                        <a href="#" aria-label="TikTok" class="w-9 h-9 rounded-full bg-neutral-800 flex items-center justify-center hover:bg-primary transition-colors"><i class="fa fa-music"></i></a>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="text-lg font-semibold mb-5">Shop</h4>
+                    <ul class="space-y-3 text-sm">
+                        <li><a href="products.html" class="text-neutral-400 hover:text-white transition-colors">All Crystals</a></li>
+                        <li><a href="products.html" class="text-neutral-400 hover:text-white transition-colors">Core Series</a></li>
+                        <li><a href="diy.html" class="text-neutral-400 hover:text-white transition-colors">Design Your Own</a></li>
+                        <li><a href="products.html" class="text-neutral-400 hover:text-white transition-colors">Pet Friendly</a></li>
+                        <li><a href="cart.html" class="text-neutral-400 hover:text-white transition-colors">Shopping Cart</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-lg font-semibold mb-5">Resources</h4>
+                    <ul class="space-y-3 text-sm">
+                        <li><a href="blog.html" class="text-neutral-400 hover:text-white transition-colors">Blog</a></li>
+                        <li><a href="resources.html" class="text-neutral-400 hover:text-white transition-colors">Free Guides</a></li>
+                        <li><a href="our-story.html" class="text-neutral-400 hover:text-white transition-colors">Our Story</a></li>
+                        <li><a href="our-values.html" class="text-neutral-400 hover:text-white transition-colors">Our Values</a></li>
+                        <li><a href="faq.html" class="text-neutral-400 hover:text-white transition-colors">FAQ</a></li>
+                        <li><a href="contact.html" class="text-neutral-400 hover:text-white transition-colors">Contact Us</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="text-lg font-semibold mb-5">Customer Service</h4>
+                    <ul class="space-y-3 text-sm">
+                        <li><a href="faq.html" class="text-neutral-400 hover:text-white transition-colors">Shipping Policy</a></li>
+                        <li><a href="faq.html" class="text-neutral-400 hover:text-white transition-colors">Return Policy</a></li>
+                        <li><a href="account.html" class="text-neutral-400 hover:text-white transition-colors">Track Order</a></li>
+                        <li><a href="account.html" class="text-neutral-400 hover:text-white transition-colors">My Account</a></li>
+                        <li><a href="contact.html" class="text-neutral-400 hover:text-white transition-colors">Support Center</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 支付与配送 -->
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4 py-6 border-t border-neutral-800">
+                <div class="flex items-center gap-3 text-neutral-400 text-sm">
+                    <i class="fa fa-truck text-primary"></i><span>Insured global shipping</span>
+                    <span class="mx-2 text-neutral-700">|</span>
+                    <span>We accept</span>
+                    <i class="fa fa-cc-visa text-2xl text-neutral-300"></i>
+                    <i class="fa fa-cc-mastercard text-2xl text-neutral-300"></i>
+                    <i class="fa fa-paypal text-2xl text-neutral-300"></i>
+                </div>
+                <div class="flex gap-4 text-xs text-neutral-500">
+                    <a href="faq.html" class="hover:text-white transition-colors">Privacy Policy</a>
+                    <a href="faq.html" class="hover:text-white transition-colors">Terms of Service</a>
+                </div>
+            </div>
+
+            <div class="border-t border-neutral-800 pt-6 text-center text-neutral-500 text-sm">
+                <p>&copy; 2026 LuminaGems. All rights reserved. Crafted with intention.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ============ 悬浮组件（脱离文档流） ============ -->
+    <!-- 回到顶部 -->
+    <button id="backToTop" class="back-to-top" aria-label="Back to top"><i class="fa fa-chevron-up"></i></button>
+    <!-- Gemly AI 触发按钮 -->
+    <button id="openGemlyAiBtn" class="agent-fab" aria-label="Chat with Crystal Soul" title="与Crystal Soul（晶灵）对话">
+        <i class="fa fa-comments text-xl"></i>
+    </button>
+
+    <!-- ============ Gemly AI 对话抽屉组件（自研樱花粉白主题·不嵌入任何第三方页面） ============ -->
+    <aside id="gemlyDrawer" class="gemly-drawer" aria-hidden="true" role="dialog" aria-label="Gemly AI Crystal Advisor">
+        <!-- 顶部标题栏 60px -->
+        <header class="gemly-header">
+            <div class="gemly-header-info">
+                <span class="gemly-header-icon"><i class="fa fa-gem"></i></span>
+                <div class="min-w-0">
+                    <h3 class="gemly-header-title">Gemly AI · Crystal Advisor</h3>
+                    <p class="gemly-header-sub">Crystal Soul｜人宠晶石疗愈顾问</p>
+                </div>
+            </div>
+            <div class="gemly-header-actions">
+                <button id="gemlyDrawerHide" class="gemly-icon-btn" aria-label="收起" title="收起"><i class="fa fa-angle-right"></i></button>
+                <button id="gemlyDrawerClose" class="gemly-icon-btn" aria-label="关闭" title="关闭"><i class="fa fa-times"></i></button>
+            </div>
+        </header>
+
+        <!-- 对话滚动容器 -->
+        <div id="gemlyChatBody" class="gemly-chat-body"></div>
+
+        <!-- 底部输入栏 72px -->
+        <footer class="gemly-input-bar">
+            <input id="gemlyInput" type="text" class="gemly-input" placeholder="给晶灵留言，回车发送…" autocomplete="off" maxlength="500">
+            <button id="gemlySendBtn" class="gemly-send-btn" aria-label="发送"><i class="fa fa-paper-plane"></i></button>
+        </footer>
+    </aside>
+    <!-- 抽屉遮罩(仅移动端点击关闭,PC端透明不阻挡主体浏览) -->
+    <div id="gemlyDrawerBackdrop" class="gemly-drawer-backdrop" aria-hidden="true"></div>
+
+    <style>
+        /* === Gemly AI 樱花粉白主题 === */
+        .gemly-drawer {
+            position: fixed; top: 0; right: 0; bottom: 0;
+            width: 420px; max-width: 100vw; height: 100vh;
+            background: #FFF8FA;            /* 粉白底色 */
+            z-index: 10000;
+            transform: translateX(100%);
+            display: flex; flex-direction: column;
+            box-shadow: -12px 0 40px rgba(255, 182, 193, 0.22);
+            will-change: transform;
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+        .gemly-drawer.open { transform: translateX(0); }
+
+        /* 顶部标题栏 60px */
+        .gemly-header {
+            height: 60px; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 12px; padding: 0 16px;
+            background: linear-gradient(180deg, #FFF0F5 0%, #FFE6EF 100%);
+            border-bottom: 1px solid #FFE0EC;
+        }
+        .gemly-header-info { display: flex; align-items: center; gap: 10px; min-width: 0; }
+        .gemly-header-icon {
+            width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
+            background: linear-gradient(135deg, #FFD1DC 0%, #FFB6C1 100%);
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 14px;
+            box-shadow: 0 4px 12px rgba(255, 209, 220, 0.5);
+        }
+        .gemly-header-title { font-size: 14px; font-weight: 600; color: #222222; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .gemly-header-sub { font-size: 11px; color: #8a7079; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .gemly-header-actions { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+        .gemly-icon-btn {
+            width: 32px; height: 32px; border-radius: 10px;
+            display: inline-flex; align-items: center; justify-content: center;
+            color: #8a7079; background: transparent; border: none; cursor: pointer; font-size: 15px;
+            transition: background .2s ease, color .2s ease;
+        }
+        .gemly-icon-btn:hover { background: #FFD1DC; color: #fff; }
+
+        /* 对话滚动区 */
+        .gemly-chat-body {
+            flex: 1 1 0%; min-height: 0; overflow-y: auto; overflow-x: hidden;
+            padding: 18px 16px; display: flex; flex-direction: column; gap: 16px;
+        }
+        .gemly-chat-body::-webkit-scrollbar { width: 6px; }
+        .gemly-chat-body::-webkit-scrollbar-thumb { background: #FFD1DC; border-radius: 6px; }
+        .gemly-chat-body::-webkit-scrollbar-track { background: transparent; }
+
+        /* 消息行 */
+        .gemly-msg { display: flex; gap: 8px; max-width: 92%; }
+        .gemly-msg-ai { align-self: flex-start; }
+        .gemly-msg-user { align-self: flex-end; flex-direction: row-reverse; }
+
+        /* 头像 */
+        .gemly-avatar { width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center; font-size: 13px; }
+        .gemly-avatar-ai { background: linear-gradient(135deg, #FFD1DC 0%, #FFB6C1 100%); color: #fff; box-shadow: 0 2px 8px rgba(255, 209, 220, 0.5); }
+        .gemly-avatar-user { background: #fff; color: #FFB6C1; border: 1.5px solid #FFD1DC; }
+
+        /* 气泡 */
+        .gemly-bubble { padding: 10px 14px; font-size: 13.5px; line-height: 1.6; word-break: break-word; }
+        .gemly-bubble-ai { background: #FFFFFF; color: #444444; border: 1px solid #FFE0EC; border-radius: 4px 14px 14px 14px; box-shadow: 0 2px 10px rgba(255, 182, 193, 0.1); }
+        .gemly-bubble-user { background: #FFD1DC; color: #5a3a42; border-radius: 14px 4px 14px 14px; box-shadow: 0 2px 10px rgba(255, 209, 220, 0.35); }
+
+        /* loading 三点动画 */
+        .gemly-typing { display: inline-flex; gap: 4px; padding: 4px 2px; }
+        .gemly-typing span { width: 7px; height: 7px; border-radius: 50%; background: #FFB6C1; animation: gemlyBlink 1.2s infinite ease-in-out both; }
+        .gemly-typing span:nth-child(2) { animation-delay: .2s; }
+        .gemly-typing span:nth-child(3) { animation-delay: .4s; }
+        @keyframes gemlyBlink { 0%, 80%, 100% { opacity: .3; transform: scale(.8); } 40% { opacity: 1; transform: scale(1); } }
+
+        /* 底部输入栏 72px */
+        .gemly-input-bar {
+            height: 72px; flex-shrink: 0; padding: 12px 14px;
+            display: flex; align-items: center; gap: 10px;
+            background: #FFFFFF; border-top: 1px solid #FFE0EC;
+        }
+        .gemly-input {
+            flex: 1; height: 44px; border-radius: 22px; border: 1.5px solid #FFE0EC;
+            padding: 0 18px; font-size: 14px; color: #444444; background: #FFF8FA;
+            outline: none; transition: border-color .2s ease, box-shadow .2s ease;
+        }
+        .gemly-input::placeholder { color: #c9a8b2; }
+        .gemly-input:focus { border-color: #FFD1DC; box-shadow: 0 0 0 3px rgba(255, 209, 220, 0.25); background: #fff; }
+        .gemly-send-btn {
+            width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0;
+            background: linear-gradient(135deg, #FFD1DC 0%, #FFB6C1 100%); color: #fff;
+            border: none; cursor: pointer; font-size: 15px;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 12px rgba(255, 209, 220, 0.5);
+            transition: transform .2s ease, opacity .2s ease;
+        }
+        .gemly-send-btn:hover { transform: scale(1.08); }
+        .gemly-send-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+
+        /* 遮罩:PC透明不阻挡,移动端半透明可点击关闭 */
+        .gemly-drawer-backdrop { position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,0); pointer-events: none; transition: background .35s ease; }
+        .gemly-drawer-backdrop.show { background: rgba(34, 34, 34, 0.25); }
+        @media (max-width: 640px) {
+            .gemly-drawer { width: 100vw; }
+            .gemly-drawer-backdrop.show { background: rgba(34, 34, 34, 0.4); pointer-events: auto; }
+        }
+        .agent-fab.drawer-active { transform: scale(.92); opacity: .8; }
+    </style>
+
+    <script>
+    /* === Gemly AI 对话抽屉逻辑(自执行,不污染全局) === */
+    (function () {
+        /* ========= 配置区(上线前必读) ========= */
+        // ① 演示模式开关：true=本地模拟回复(仅调试用,禁止上线)；false=走后端代理调用真实AI
+        //    ⚠️ 上线前必须改为 false,否则用户收到的都是模拟文案,且无法对接智能体
+        var GEMLY_DEMO_MODE = true;
+
+        // ② 后端代理接口地址(演示模式关闭后生效)
+        //    ⚠️ ①需要后端实现的代理接口地址位置：该接口由你的后端服务实现,
+        //       后端在此接口内携带 Coze PAT 令牌 + agent_id 转发请求到 Coze 开放API,
+        //       响应需返回 JSON: { "reply": "AI回复文本" }
+        //    请求体示例(前端发给后端): { "agent_id": "...", "message": "用户输入", "history": [...] }
+        var GEMLY_PROXY_URL = '/api/gemly-chat';
+
+        // ③ Coze agent_id(智能体ID,可放前端；PAT个人访问令牌严禁写前端,只能放后端)
+        //    ⚠️ ②需要填写的Coze agent_id：在Coze平台智能体详情页获取,填入下方引号内
+        var GEMLY_AGENT_ID = '';
+        /* ========= 配置区结束 ========= */
+
+        var drawer = document.getElementById('gemlyDrawer');
+        var backdrop = document.getElementById('gemlyDrawerBackdrop');
+        var openBtn = document.getElementById('openGemlyAiBtn');
+        var closeBtn = document.getElementById('gemlyDrawerClose');
+        var hideBtn = document.getElementById('gemlyDrawerHide');
+        var chatBody = document.getElementById('gemlyChatBody');
+        var input = document.getElementById('gemlyInput');
+        var sendBtn = document.getElementById('gemlySendBtn');
+        if (!drawer || !openBtn || !chatBody) return;
+
+        var animTimer = null;
+        var isSending = false;
+        var history = []; // 对话历史仅存内存,刷新清空
+
+        /* --- 滑入滑出动画(JS驱动,规避部分环境 transition 失效) --- */
+        function slide(toOpen) {
+            if (animTimer) { clearTimeout(animTimer); animTimer = null; }
+            var width = drawer.offsetWidth;
+            var t = drawer.style.transform || '';
+            var m = t.match(/translateX\(([-\d.]+)px\)/);
+            var start = m ? parseFloat(m[1]) : (toOpen ? width : 0);
+            var end = toOpen ? 0 : width;
+            drawer.style.transform = 'translateX(' + start + 'px)';
+            var duration = 350, t0 = Date.now();
+            function ease(p) { return p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2; }
+            (function step() {
+                var p = Math.min((Date.now() - t0) / duration, 1);
+                drawer.style.transform = 'translateX(' + (start + (end - start) * ease(p)) + 'px)';
+                if (p < 1) { animTimer = setTimeout(step, 16); }
+                else { drawer.style.transform = ''; animTimer = null; }
+            })();
+        }
+        function openDrawer() {
+            drawer.classList.add('open');
+            drawer.setAttribute('aria-hidden', 'false');
+            backdrop.classList.add('show');
+            openBtn.classList.add('drawer-active');
+            document.body.style.overflow = 'hidden';
+            slide(true);
+            if (!chatBody.hasChildNodes()) addAiMessage('Hi, I\'m Crystal Soul 💎 Your sanctuary for crystal healing & pet companionship. How may I guide your journey today?');
+            setTimeout(function () { input && input.focus(); }, 360);
+        }
+        function closeDrawer() {
+            drawer.classList.remove('open');
+            drawer.setAttribute('aria-hidden', 'true');
+            backdrop.classList.remove('show');
+            openBtn.classList.remove('drawer-active');
+            document.body.style.overflow = '';
+            slide(false);
+        }
+        openBtn.addEventListener('click', openDrawer);
+        if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
+        if (hideBtn) hideBtn.addEventListener('click', closeDrawer);
+        if (backdrop) backdrop.addEventListener('click', closeDrawer);
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && drawer.classList.contains('open')) closeDrawer();
+        });
+
+        /* --- 消息渲染 --- */
+        function scrollBottom() { chatBody.scrollTop = chatBody.scrollHeight; }
+        function addUserMessage(text) {
+            var row = document.createElement('div');
+            row.className = 'gemly-msg gemly-msg-user';
+            row.innerHTML = '<div class="gemly-avatar gemly-avatar-user"><i class="fa fa-user"></i></div><div class="gemly-bubble gemly-bubble-user"></div>';
+            row.querySelector('.gemly-bubble').textContent = text;
+            chatBody.appendChild(row);
+            scrollBottom();
+        }
+        function addAiMessage(text) {
+            var row = document.createElement('div');
+            row.className = 'gemly-msg gemly-msg-ai';
+            row.innerHTML = '<div class="gemly-avatar gemly-avatar-ai"><i class="fa fa-gem"></i></div><div class="gemly-bubble gemly-bubble-ai"></div>';
+            row.querySelector('.gemly-bubble').textContent = text;
+            chatBody.appendChild(row);
+            scrollBottom();
+        }
+        function showTyping() {
+            var row = document.createElement('div');
+            row.className = 'gemly-msg gemly-msg-ai gemly-typing-row';
+            row.innerHTML = '<div class="gemly-avatar gemly-avatar-ai"><i class="fa fa-gem"></i></div><div class="gemly-bubble gemly-bubble-ai"><span class="gemly-typing"><span></span><span></span><span></span></span></div>';
+            chatBody.appendChild(row);
+            scrollBottom();
+            return row;
+        }
+
+        /* --- 发送 --- */
+        function send() {
+            var text = (input.value || '').trim();
+            if (!text || isSending) return;
+            isSending = true;
+            sendBtn.disabled = true;
+            input.value = '';
+            addUserMessage(text);
+            history.push({ role: 'user', content: text });
+            var typing = showTyping();
+
+            if (GEMLY_DEMO_MODE) {
+                // ⚠️ 演示模式:本地模拟回复,仅本地调试用,禁止上线
+                var replies = [
+                    'Crystals carry ancient calm. Amethyst soothes anxiety, while rose quartz opens the heart. Which energy calls to you?',
+                    'For your pet companion, try placing a gentle rose quartz near their resting spot — it radiates love and safety.',
+                    'Every LuminaGems piece is ethically sourced and energy-cleansed. Your crystal chooses you as much as you choose it.',
+                    'Take a deep breath. Hold your crystal, set an intention, and let its frequency align with yours.',
+                    'Crystal Soul is here for you. Tell me more about what your heart or your pet needs today.'
+                ];
+                setTimeout(function () {
+                    typing.remove();
+                    var r = replies[Math.floor(Math.random() * replies.length)];
+                    addAiMessage(r);
+                    history.push({ role: 'assistant', content: r });
+                    isSending = false;
+                    sendBtn.disabled = false;
+                    input.focus();
+                }, 900 + Math.random() * 700);
+            } else {
+                // 真实模式:调用后端代理接口(后端携带PAT令牌转发到Coze API)
+                fetch(GEMLY_PROXY_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ agent_id: GEMLY_AGENT_ID, message: text, history: history })
+                }).then(function (res) {
+                    if (!res.ok) throw new Error('HTTP ' + res.status);
+                    return res.json();
+                }).then(function (data) {
+                    typing.remove();
+                    var reply = (data && data.reply) ? data.reply : 'Sorry, Crystal Soul is resting. Please try again later.';
+                    addAiMessage(reply);
+                    history.push({ role: 'assistant', content: reply });
+                }).catch(function (err) {
+                    typing.remove();
+                    addAiMessage('Network hiccup — please check your connection and try again. ✨');
+                }).then(function () {
+                    isSending = false;
+                    sendBtn.disabled = false;
+                    input.focus();
+                });
+            }
+        }
+        if (sendBtn) sendBtn.addEventListener('click', send);
+        if (input) input.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+        });
+    })();
+    </script>
+    <!-- ============ /Gemly AI 对话抽屉组件 ============ -->
+
+    <!-- Cookie 同意弹窗 -->
+    <div id="cookieBanner" class="cookie-banner">
+        <div class="container mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p class="text-sm text-neutral-300 text-center sm:text-left">
+                <i class="fa fa-info-circle mr-2 text-primary"></i>
+                We use cookies to enhance your browsing experience and analyze traffic. By continuing, you agree to our use of cookies.
+            </p>
+            <div class="flex gap-3 flex-shrink-0">
+                <button id="cookieAccept" class="bg-primary hover:bg-primary/90 text-white text-sm font-medium px-5 py-2 rounded-full transition-colors">Accept</button>
+                <button id="cookieDecline" class="bg-neutral-700 hover:bg-neutral-600 text-white text-sm font-medium px-5 py-2 rounded-full transition-colors">Decline</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ JavaScript ============ -->
+    <script>
+        // 导航栏滚动毛玻璃效果
+        const navbar = document.getElementById('navbar');
+        function syncNavbar() {
+            if (window.scrollY > 50) {
+                navbar.classList.add('bg-neutral-900/95', 'backdrop-blur-md', 'shadow-lg');
+                navbar.classList.remove('bg-transparent');
+            } else {
+                navbar.classList.remove('bg-neutral-900/95', 'backdrop-blur-md', 'shadow-lg');
+                navbar.classList.add('bg-transparent');
+            }
+        }
+        window.addEventListener('scroll', syncNavbar);
+        syncNavbar();
+
+        // 移动端菜单切换
+        document.getElementById('menu-toggle').addEventListener('click', function () {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        });
+
+        // 平滑滚动：仅处理有效锚点，忽略 href="#" 等无效值避免报错
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                const targetId = this.getAttribute('href');
+                if (!targetId || targetId === '#' || targetId.length < 2) return; // 边界判断
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    e.preventDefault();
+                    window.scrollTo({ top: targetElement.offsetTop - 80, behavior: 'smooth' });
+                    document.getElementById('mobile-menu').classList.add('hidden');
+                }
+            });
+        });
+
+        // 回到顶部按钮显示/隐藏
+        const backToTop = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => {
+            backToTop.classList.toggle('visible', window.scrollY > 400);
+        });
+        backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+        // Cookie 同意弹窗逻辑
+        const cookieBanner = document.getElementById('cookieBanner');
+        if (!localStorage.getItem('haven_cookies')) {
+            setTimeout(() => cookieBanner.classList.add('show'), 1200);
+        }
+        document.getElementById('cookieAccept').addEventListener('click', () => {
+            localStorage.setItem('haven_cookies', 'accepted');
+            cookieBanner.classList.remove('show');
+        });
+        document.getElementById('cookieDecline').addEventListener('click', () => {
+            localStorage.setItem('haven_cookies', 'declined');
+            cookieBanner.classList.remove('show');
+        });
+    </script>
+    <script>
+/* ======== LuminaGems 多语言字典 ======== */
+const HAVEN_I18N = {
+EN:{
+"Home":"Home","Shop":"Shop","Our Story":"Our Story","Our Values":"Our Values","Blog":"Blog","Resources":"Resources",
+"Contact":"Contact","Design Your Own":"Design Your Own","Account":"Account","Cart":"Cart",
+"Search LuminaGems":"Search LuminaGems","Close search":"Close search",
+"Search crystals, healing guides, blog...":"Search crystals, healing guides, blog...",
+"Popular Searches":"Popular Searches","Amethyst":"Amethyst","Rose Quartz":"Rose Quartz","Pet Friendly":"Pet Friendly",
+"Meditation Guide":"Meditation Guide","Healing Gift":"Healing Gift",
+"We use cookies to enhance your browsing experience and analyze traffic. By continuing, you agree to our use of cookies.":"We use cookies to enhance your browsing experience and analyze traffic. By continuing, you agree to our use of cookies.",
+"Accept":"Accept","Decline":"Decline","English":"English","中文":"中文","日本語":"日本語",
+"All Crystals":"All Crystals","Core Series":"Core Series","Shopping Cart":"Shopping Cart",
+"Free Guides":"Free Guides","FAQ":"FAQ","Contact Us":"Contact Us","Support Center":"Support Center",
+"Shipping Policy":"Shipping Policy","Return Policy":"Return Policy","Track Order":"Track Order","My Account":"My Account",
+"Payment Methods":"Payment Methods","Worldwide Shipping":"Worldwide Shipping",
+"Privacy Policy":"Privacy Policy","Terms of Service":"Terms of Service","All rights reserved.":"All rights reserved.",
+"Subscribe":"Subscribe","Stay in the loop for new launches, healing guides & exclusive offers.":"Stay in the loop for new launches, healing guides & exclusive offers.",
+"Enter your email":"Enter your email","Ethically Sourced":"Ethically Sourced","Healing Energy":"Healing Energy","Global Shipping":"Global Shipping",
+"Every crystal is traceably sourced from trusted miners who honor the earth.":"Every crystal is traceably sourced from trusted miners who honor the earth.",
+"Cleansed and charged to support emotional balance and mindful living.":"Cleansed and charged to support emotional balance and mindful living.",
+"Sustainable packaging + tracked & insured delivery to 50+ countries.":"Sustainable packaging + tracked & insured delivery to 50+ countries.",
+"Pet-safe stones and companion pieces designed to comfort animals, too.":"Pet-safe stones and companion pieces designed to comfort animals, too.",
+"Handcrafted Crystal · Botanical Inspired · Healing Energy":"Handcrafted Crystal · Botanical Inspired · Healing Energy",
+"CRYSTAL BOTANICAL COLLECTION":"CRYSTAL BOTANICAL COLLECTION",
+"Ethically sourced crystals crafted to calm the mind, uplift the spirit, and accompany every soul — including your beloved pets.":"Ethically sourced crystals crafted to calm the mind, uplift the spirit, and accompany every soul — including your beloved pets.",
+"Shop The Collection":"Shop The Collection","Discover Our Story":"Discover Our Story","Signature Lines":"Signature Lines",
+"ArtisVault":"ArtisVault","Lumina":"Lumina","TerraSeek":"TerraSeek",
+"Healing Energy Collection":"Healing Energy Collection","Explore the Collection":"Explore the Collection",
+"Energy Categories":"Energy Categories","Shop by Intention":"Shop by Intention",
+"Protection & Security":"Protection & Security","Love & Harmony":"Love & Harmony","Clarity & Focus":"Clarity & Focus","Grounding & Stability":"Grounding & Stability",
+"Real Stories":"Real Stories","Healing Journeys From Our Community":"Healing Journeys From Our Community",
+"From soothing anxiety to comforting anxious pets, our pieces are designed to be lived with, not just worn. Every gem carries a story, and every story begins with you.":"From soothing anxiety to comforting anxious pets, our pieces are designed to be lived with, not just worn. Every gem carries a story, and every story begins with you.",
+"Read Our Full Story":"Read Our Full Story","Brand Story":"Brand Story","Meet the Founders":"Meet the Founders",
+"Discover the philosophy behind LuminaGems and how crystals became our medium for emotional healing.":"Discover the philosophy behind LuminaGems and how crystals became our medium for emotional healing.",
+"Worldwide delivery with insured tracking on every order over $99.":"Worldwide delivery with insured tracking on every order over $99.",
+"Categories":"Categories","Still have questions?":"Still have questions?","Contact our team":"Contact our team","Send Message":"Send Message","Response within 24 hours":"Response within 24 hours",
+"Sign In":"Sign In","Create Account":"Create Account","or continue with":"or continue with",
+"I agree to the Terms of Service and Privacy Policy. Sign me up for the newsletter &amp; 10% off.":"I agree to the Terms of Service and Privacy Policy. Sign me up for the newsletter &amp; 10% off.",
+"Remember me":"Remember me","Forgot password?":"Forgot password?","Full Name":"Full Name","Email Address":"Email Address","Password":"Password","Create Password":"Create Password",
+"At least 8 characters":"At least 8 characters","Shipping &amp; Returns":"Shipping &amp; Returns","Crystal Care":"Crystal Care","Healing Basics":"Healing Basics","Membership":"Membership",
+"Still have questions? Contact our team":"Still have questions? Contact our team",
+"No questions match your search. Try a different keyword.":"No questions match your search. Try a different keyword.","Search questions...":"Search questions...",
+"Welcome to Your Sacred Haven":"Welcome to Your Sacred Haven",
+"Join thousands of mindful souls earning rewards, unlocking healing guides, and finding crystals that resonate with their journey.":"Join thousands of mindful souls earning rewards, unlocking healing guides, and finding crystals that resonate with their journey.",
+"Blending Eastern crystal aesthetics with emotional healing and pet companionship — bringing balance, protection, and alignment to your life.":"Blending Eastern crystal aesthetics with emotional healing and pet companionship — bringing balance, protection, and alignment to your life.",
+"Sign up to download":"Sign up to download","Leave your email and we'll send the guide straight to your inbox.":"Leave your email and we'll send the guide straight to your inbox.",
+"Get the Guide":"Get the Guide","Crystal DIY Workshop":"Crystal DIY Workshop","A Sanctuary, Carried in Stone":"A Sanctuary, Carried in Stone",
+"The Pillars of LuminaGems":"The Pillars of LuminaGems","ArtisVault Protection Bracelet":"ArtisVault Protection Bracelet",
+"Your Cart":"Your Cart","Welcome back, Sarah":"Welcome back, Sarah","Stories, Guides & Crystal Wisdom":"Stories, Guides & Crystal Wisdom",
+"Healing Crystals 101: A Beginner's Complete Guide":"Healing Crystals 101: A Beginner's Complete Guide","Free Healing Resources":"Free Healing Resources",
+"Get in Touch":"Get in Touch","View All Products":"View All Products","Learn More":"Learn More",
+"Frequently Asked Questions":"Frequently Asked Questions","Explore Our Values":"Explore Our Values","Read the Blog":"Read the Blog","Download Free Guides":"Download Free Guides",
+"Insured global shipping":"Insured global shipping","We accept":"We accept","Company":"Company","Customer Service":"Customer Service","Quick Links":"Quick Links",
+"Contact information":"Contact information","Send us a message":"Send us a message","Email":"Email","Phone":"Phone","Address":"Address","Live Chat":"Live Chat",
+"Mon-Fri: 9AM - 6PM EST":"Mon-Fri: 9AM - 6PM EST","Sat-Sun: Email only":"Sat-Sun: Email only",
+"Name":"Name","Subject":"Subject","Your Message":"Your Message","Send":"Send","Cancel":"Cancel","Clear":"Clear",
+"FAQ categories":"FAQ categories","All Categories":"All Categories","Product FAQ":"Product FAQ","Shipping":"Shipping","Returns":"Returns","Order Issues":"Order Issues",
+"Technical Support":"Technical Support","Wholesale":"Wholesale","Popular Questions":"Popular Questions","Ask a Question":"Ask a Question",
+"How do I choose the right crystal?":"How do I choose the right crystal?","Are your crystals ethically sourced?":"Are your crystals ethically sourced?",
+"How long does shipping take?":"How long does shipping take?","What is your return policy?":"What is your return policy?",
+"Can I customize a bracelet?":"Can I customize a bracelet?","Are crystals safe for pets?":"Are crystals safe for pets?",
+"How do I care for my crystals?":"How do I care for my crystals?","Do you ship internationally?":"Do you ship internationally?",
+"What is your warranty policy?":"What is your warranty policy?","How do I contact customer support?":"How do I contact customer support?",
+"Featured Resources":"Featured Resources","Guide":"Guide","Workshop":"Workshop","Webinar":"Webinar","Videos":"Videos","Printables":"Printables","Meditations":"Meditations",
+"Customer Stories":"Customer Stories","Testimonials":"Testimonials","Reviews":"Reviews","Loading...":"Loading...","More":"More","Less":"Less",
+"Show More":"Show More","Show Less":"Show Less","Previous":"Previous","Next":"Next","Close":"Close","Menu":"Menu","Wishlist":"Wishlist",
+"Wellness":"Wellness","Wealth":"Wealth","Protection":"Protection","Blessedness":"Blessedness","Calmness":"Calmness","Guardian":"Guardian","Purifying":"Purifying","Shop by Energy":"Shop by Energy","From the Journal":"From the Journal","Healing Guides & Crystal Stories":"Healing Guides & Crystal Stories","Join the Haven":"Join the Haven","Join Our Energy Community":"Join Our Energy Community","Subscribe Now":"Subscribe Now","Tools to support physical & mental wellbeing":"Tools to support physical & mental wellbeing","Manifest abundance & prosperity":"Manifest abundance & prosperity","Shield your energy from negativity":"Shield your energy from negativity","Cultivate self-love & connection":"Cultivate self-love & connection","Find peace in life's chaos":"Find peace in life's chaos","Deepen your spiritual connection":"Deepen your spiritual connection","Tap into your inner strength":"Tap into your inner strength","Renew yourself day by day":"Renew yourself day by day","Everything you need to know when starting your crystal energy journey.":"Everything you need to know when starting your crystal energy journey.","Gentle stones that bring peace to your furry family members.":"Gentle stones that bring peace to your furry family members.","Create harmonious energy in every corner of your living space.":"Create harmonious energy in every corner of your living space.","Get exclusive crystal guides, energy tips, and 10% off your first order delivered to your inbox.":"Get exclusive crystal guides, energy tips, and 10% off your first order delivered to your inbox.","By subscribing you agree to our Privacy Policy. Unsubscribe anytime.":"By subscribing you agree to our Privacy Policy. Unsubscribe anytime.","Instagram":"Instagram","Pinterest":"Pinterest","Facebook":"Facebook","TikTok":"TikTok","Chat with Crystal Soul":"Chat with Crystal Soul","Design inspiration for body, mind & spirit.":"Design inspiration for body, mind & spirit.","Healing tools & guides for your wellness journey.":"Healing tools & guides for your wellness journey."},
+ZH:{
+"Home":"首页","Shop":"商店","Our Story":"品牌故事","Our Values":"价值理念","Blog":"疗愈博客","Resources":"免费资源",
+"Contact":"联系我们","Design Your Own":"自定义设计","Account":"会员中心","Cart":"购物车",
+"Search LuminaGems":"搜索 LuminaGems","Close search":"关闭搜索",
+"Search crystals, healing guides, blog...":"搜索晶石、疗愈指南、博客文章...",
+"Popular Searches":"热门搜索","Amethyst":"紫水晶","Rose Quartz":"玫瑰水晶","Pet Friendly":"宠物友好",
+"Meditation Guide":"冥想指南","Healing Gift":"疗愈礼物",
+"We use cookies to enhance your browsing experience and analyze traffic. By continuing, you agree to our use of cookies.":"我们使用 Cookie 优化浏览体验并分析流量,继续使用即表示您同意我们的 Cookie 政策。",
+"Accept":"同意","Decline":"拒绝","English":"English","中文":"中文","日本語":"日本語",
+"All Crystals":"全部晶石","Core Series":"核心系列","Shopping Cart":"购物车",
+"Free Guides":"免费指南","FAQ":"常见问题","Contact Us":"联系我们","Support Center":"帮助中心",
+"Shipping Policy":"配送政策","Return Policy":"退换货政策","Track Order":"订单追踪","My Account":"我的账户",
+"Payment Methods":"支付方式","Worldwide Shipping":"全球配送","Privacy Policy":"隐私政策","Terms of Service":"服务条款",
+"All rights reserved.":"版权所有。","Subscribe":"订阅","Stay in the loop for new launches, healing guides & exclusive offers.":"订阅获取新品上架、疗愈指南和独家优惠。",
+"Enter your email":"请输入邮箱地址","Ethically Sourced":"道德溯源采购","Healing Energy":"疗愈能量","Global Shipping":"全球配送",
+"Every crystal is traceably sourced from trusted miners who honor the earth.":"每一颗晶石都来自尊重大地的可信矿商,来源可查。",
+"Cleansed and charged to support emotional balance and mindful living.":"净矿充能,助力情绪平衡与正念生活。",
+"Sustainable packaging + tracked & insured delivery to 50+ countries.":"环保包装,支持 50+ 国家可追踪、投保配送。",
+"Pet-safe stones and companion pieces designed to comfort animals, too.":"宠物安全晶石与陪伴饰品,同样为安抚动物而设计。",
+"Handcrafted Crystal · Botanical Inspired · Healing Energy":"手工晶石 · 植物灵感 · 疗愈能量",
+"CRYSTAL BOTANICAL COLLECTION":"CRYSTAL BOTANICAL COLLECTION",
+"Ethically sourced crystals crafted to calm the mind, uplift the spirit, and accompany every soul — including your beloved pets.":"每一颗晶石均经过道德筛选,旨在安抚心灵、振奋精神,陪伴每一个灵魂——包括您挚爱的宠物。",
+"Shop The Collection":"选购全部系列","Discover Our Story":"了解品牌故事","Signature Lines":"核心系列",
+"ArtisVault":"ArtisVault","Lumina":"Lumina","TerraSeek":"TerraSeek","Healing Energy Collection":"疗愈能量系列","Explore the Collection":"探索系列",
+"Energy Categories":"能量分类","Shop by Intention":"按意图选购","Protection & Security":"守护与安定","Love & Harmony":"爱与和谐",
+"Clarity & Focus":"专注与清明","Grounding & Stability":"稳定与扎根","Real Stories":"真实故事","Healing Journeys From Our Community":"社区疗愈故事",
+"From soothing anxiety to comforting anxious pets, our pieces are designed to be lived with, not just worn. Every gem carries a story, and every story begins with you.":"从缓解焦虑到安抚受惊吓的宠物,我们的晶石旨在被生活所浸润,而非仅仅被佩戴。每一颗宝石都承载一个故事,而每个故事都从你开始。",
+"Read Our Full Story":"阅读完整故事","Brand Story":"品牌故事","Meet the Founders":"认识创始人",
+"Discover the philosophy behind LuminaGems and how crystals became our medium for emotional healing.":"探索 LuminaGems 背后的理念,了解晶石如何成为我们进行情绪疗愈的媒介。",
+"Worldwide delivery with insured tracking on every order over $99.":"全球配送,单笔订单满 $99 即可享保价追踪服务。",
+"Categories":"问题分类","Still have questions?":"还有疑问?","Contact our team":"联系我们的团队","Send Message":"发送消息","Response within 24 hours":"24 小时内回复",
+"Sign In":"登录","Create Account":"注册账户","or continue with":"或使用第三方登录",
+"I agree to the Terms of Service and Privacy Policy. Sign me up for the newsletter &amp; 10% off.":"我同意服务条款和隐私政策,订阅邮件通讯并享受首单 10% 优惠。",
+"Remember me":"记住我","Forgot password?":"忘记密码?","Full Name":"姓名","Email Address":"邮箱地址","Password":"密码","Create Password":"设置密码",
+"At least 8 characters":"至少 8 位字符","Shipping &amp; Returns":"配送与退换","Crystal Care":"晶石养护","Healing Basics":"疗愈常识","Membership":"会员体系",
+"Still have questions? Contact our team":"还有疑问? 请联系我们的团队",
+"No questions match your search. Try a different keyword.":"未找到匹配问题,请尝试其他关键词。","Search questions...":"搜索问题...",
+"Welcome to Your Sacred Haven":"欢迎来到您的心灵庇护所",
+"Join thousands of mindful souls earning rewards, unlocking healing guides, and finding crystals that resonate with their journey.":"加入数万正念生活者,累积积分、解锁疗愈指南,找到与您灵魂共鸣的专属晶石。",
+"Blending Eastern crystal aesthetics with emotional healing and pet companionship — bringing balance, protection, and alignment to your life.":"融合东方晶石美学、情绪疗愈与人宠陪伴理念——为您的生活带来平衡、守护与滋养。",
+"Sign up to download":"订阅下载","Leave your email and we'll send the guide straight to your inbox.":"留下邮箱,我们会将指南直接发送到您的收件箱。",
+"Get the Guide":"立即获取指南","Crystal DIY Workshop":"水晶 DIY 工坊","A Sanctuary, Carried in Stone":"水晶承载的庇护所",
+"The Pillars of LuminaGems":"LuminaGems 三大支柱","ArtisVault Protection Bracelet":"ArtisVault Protection Bracelet",
+"Your Cart":"您的购物车","Welcome back, Sarah":"欢迎回来,Sarah","Stories, Guides & Crystal Wisdom":"故事、指南与水晶智慧",
+"Healing Crystals 101: A Beginner's Complete Guide":"疗愈水晶入门:新手完整指南","Free Healing Resources":"免费疗愈资源",
+"Get in Touch":"联系我们","View All Products":"查看全部产品","Learn More":"了解更多",
+"Frequently Asked Questions":"常见问题解答","Explore Our Values":"探索价值理念","Read the Blog":"阅读博客","Download Free Guides":"下载免费指南",
+"Insured global shipping":"全球保险配送","We accept":"我们接受","Company":"关于我们","Customer Service":"客户服务","Quick Links":"快速链接",
+"Contact information":"联系信息","Send us a message":"给我们留言","Email":"邮箱","Phone":"电话","Address":"地址","Live Chat":"在线客服",
+"Mon-Fri: 9AM - 6PM EST":"周一至周五:早9点-晚6点(美东)","Sat-Sun: Email only":"周六日:仅邮箱",
+"Name":"姓名","Subject":"主题","Your Message":"您的留言","Send":"发送","Cancel":"取消","Clear":"清空",
+"FAQ categories":"问题分类","All Categories":"全部分类","Product FAQ":"产品问答","Shipping":"配送相关","Returns":"退换货","Order Issues":"订单问题",
+"Technical Support":"技术支持","Wholesale":"批发合作","Popular Questions":"热门问题","Ask a Question":"提问",
+"How do I choose the right crystal?":"如何选择适合自己的晶石?","Are your crystals ethically sourced?":"你们的晶石来源道德吗?",
+"How long does shipping take?":"配送需要多长时间?","What is your return policy?":"退换货政策是什么?",
+"Can I customize a bracelet?":"可以定制手链吗?","Are crystals safe for pets?":"晶石对宠物安全吗?",
+"How do I care for my crystals?":"如何养护晶石?","Do you ship internationally?":"支持国际配送吗?",
+"What is your warranty policy?":"保修政策是什么?","How do I contact customer support?":"如何联系客服?",
+"Featured Resources":"精选资源","Guide":"指南","Workshop":"工作坊","Webinar":"线上研讨会","Videos":"视频教程","Printables":"可打印资料","Meditations":"冥想音频",
+"Customer Stories":"客户故事","Testimonials":"用户评价","Reviews":"用户评价","Loading...":"加载中...","More":"更多","Less":"收起",
+"Show More":"显示更多","Show Less":"显示更少","Previous":"上一页","Next":"下一页","Close":"关闭","Menu":"菜单","Wishlist":"收藏夹",
+"Wellness":"身心健康","Wealth":"财富显化","Protection":"守护盾","Blessedness":"感恩祝福","Calmness":"宁静之心","Guardian":"守护者","Purifying":"净化","Shop by Energy":"按能量选购","From the Journal":"来自日志","Healing Guides & Crystal Stories":"疗愈指南与水晶故事","Join the Haven":"加入 Haven","Join Our Energy Community":"加入我们的能量社区","Subscribe Now":"立即订阅","Tools to support physical & mental wellbeing":"支持身心健康的工具","Manifest abundance & prosperity":"显化丰盛与富足","Shield your energy from negativity":"守护能量免受负面侵袭","Cultivate self-love & connection":"培养自爱与连接","Find peace in life's chaos":"在混乱中寻找平静","Deepen your spiritual connection":"深化灵性连接","Tap into your inner strength":"挖掘内在力量","Renew yourself day by day":"日复一日焕新自我","Everything you need to know when starting your crystal energy journey.":"开启水晶能量旅程所需的一切知识。","Gentle stones that bring peace to your furry family members.":"为您的毛茸茸家人带来安宁的温和晶石。","Create harmonious energy in every corner of your living space.":"为您的生活空间每个角落创造和谐能量。","Get exclusive crystal guides, energy tips, and 10% off your first order delivered to your inbox.":"获取独家水晶指南、能量贴士以及首单 10% 优惠。","By subscribing you agree to our Privacy Policy. Unsubscribe anytime.":"订阅即表示您同意隐私政策,可随时退订。","Instagram":"Instagram","Pinterest":"Pinterest","Facebook":"Facebook","TikTok":"TikTok","Chat with Crystal Soul":"与晶灵对话","Design inspiration for body, mind & spirit.":"身心灵感设计","Healing tools & guides for your wellness journey.":"身心健康旅程的疗愈工具与指南。"},
+JA:{
+"Home":"ホーム","Shop":"ショップ","Our Story":"ブランドストーリー","Our Values":"価値観","Blog":"ブログ","Resources":"無料リソース",
+"Contact":"お問い合わせ","Design Your Own":"カスタムデザイン","Account":"マイページ","Cart":"カート",
+"Search LuminaGems":"LuminaGems を検索","Close search":"検索を閉じる",
+"Search crystals, healing guides, blog...":"クリスタル、ヒーリングガイド、ブログを検索...",
+"Popular Searches":"人気検索","Amethyst":"アメジスト","Rose Quartz":"ローズクォーツ","Pet Friendly":"ペットフレンドリー",
+"Meditation Guide":"瞑想ガイド","Healing Gift":"ヒーリングギフト",
+"We use cookies to enhance your browsing experience and analyze traffic. By continuing, you agree to our use of cookies.":"クッキーを使用して閲覧体験を向上し、トラフィックを分析します。継続することでクッキーの使用に同意したものとみなされます。",
+"Accept":"同意する","Decline":"拒否する","English":"English","中文":"中文","日本語":"日本語",
+"All Crystals":"すべてのクリスタル","Core Series":"コアシリーズ","Shopping Cart":"ショッピングカート",
+"Free Guides":"無料ガイド","FAQ":"よくある質問","Contact Us":"お問い合わせ","Support Center":"サポートセンター",
+"Shipping Policy":"配送ポリシー","Return Policy":"返品ポリシー","Track Order":"注文追跡","My Account":"マイアカウント",
+"Payment Methods":"お支払い方法","Worldwide Shipping":"世界中へ配送","Privacy Policy":"プライバシーポリシー","Terms of Service":"利用規約",
+"All rights reserved.":"無断転載を禁じます。","Subscribe":"購読する","Stay in the loop for new launches, healing guides & exclusive offers.":"新商品、ヒーリングガイド、限定オファーの情報をメールでお届けします。",
+"Enter your email":"メールアドレスを入力","Ethically Sourced":"倫理的調達","Healing Energy":"ヒーリングエナジー","Global Shipping":"世界配送",
+"Every crystal is traceably sourced from trusted miners who honor the earth.":"すべてのクリスタルは、地球を尊重する信頼できる鉱山家から追跡可能な形で調達されています。",
+"Cleansed and charged to support emotional balance and mindful living.":"感情的なバランスとマインドフルな生活をサポートするために、浄化・充電されています。",
+"Sustainable packaging + tracked & insured delivery to 50+ countries.":"持続可能なパッケージングと、50カ国以上への追跡可能かつ保険付き配送。",
+"Pet-safe stones and companion pieces designed to comfort animals, too.":"ペットに安全な石とコンパニオンピースは、動物を慰めるためにも設計されています。",
+"Handcrafted Crystal · Botanical Inspired · Healing Energy":"ハンドクラフトクリスタル · ボタニカルインスパイア · ヒーリングエナジー",
+"CRYSTAL BOTANICAL COLLECTION":"CRYSTAL BOTANICAL COLLECTION",
+"Ethically sourced crystals crafted to calm the mind, uplift the spirit, and accompany every soul — including your beloved pets.":"倫理的に調達されたクリスタルは、心を落ち着かせ、精神を高め、愛するペットを含むすべての魂を伴います。",
+"Shop The Collection":"コレクションを見る","Discover Our Story":"ブランドストーリーを見る","Signature Lines":"シグネチャライン",
+"ArtisVault":"ArtisVault","Lumina":"Lumina","TerraSeek":"TerraSeek","Healing Energy Collection":"ヒーリングエナジーコレクション","Explore the Collection":"コレクションを探索",
+"Energy Categories":"エネルギーカテゴリー","Shop by Intention":"意図別ショッピング","Protection & Security":"保護と安定","Love & Harmony":"愛と調和",
+"Clarity & Focus":"明瞭と集中","Grounding & Stability":"接地と安定","Real Stories":"リアルストーリー","Healing Journeys From Our Community":"コミュニティからのヒーリングジャーニー",
+"From soothing anxiety to comforting anxious pets, our pieces are designed to be lived with, not just worn. Every gem carries a story, and every story begins with you.":"不安を落ち着かせることから、不安なペットを慰めることまで、私たちの作品は単なる装身具ではなく、生活を共にするためにデザインされています。すべての石には物語があり、すべての物語はあなたから始まります。",
+"Read Our Full Story":"私たちの物語を読む","Brand Story":"ブランドストーリー","Meet the Founders":"創業者に会う",
+"Discover the philosophy behind LuminaGems and how crystals became our medium for emotional healing.":"LuminaGemsの哲学と、クリスタルが感情的ヒーリングの媒体となった経緯をご覧ください。",
+"Worldwide delivery with insured tracking on every order over $99.":"99ドル以上のご注文は、保険付き追跡で世界中に配送されます。",
+"Categories":"カテゴリー","Still have questions?":"まだ質問がありますか?","Contact our team":"カスタマーチームに連絡","Send Message":"メッセージを送信","Response within 24 hours":"24時間以内に返信",
+"Sign In":"ログイン","Create Account":"アカウント作成","or continue with":"または次の方法で",
+"I agree to the Terms of Service and Privacy Policy. Sign me up for the newsletter &amp; 10% off.":"利用規約とプライバシーポリシーに同意します。ニュースレター購読で10%オフ。",
+"Remember me":"ログイン状態を保持","Forgot password?":"パスワードをお忘れですか?","Full Name":"お名前","Email Address":"メールアドレス","Password":"パスワード","Create Password":"パスワードを設定",
+"At least 8 characters":"8文字以上","Shipping &amp; Returns":"配送・返品","Crystal Care":"クリスタルケア","Healing Basics":"ヒーリング基礎知識","Membership":"メンバーシップ",
+"Still have questions? Contact our team":"まだ質問がありますか? カスタマーチームに連絡",
+"No questions match your search. Try a different keyword.":"一致する質問が見つかりません。別のキーワードをお試しください。","Search questions...":"質問を検索...",
+"Welcome to Your Sacred Haven":"あなただけの聖域へようこそ",
+"Join thousands of mindful souls earning rewards, unlocking healing guides, and finding crystals that resonate with their journey.":"何万人ものマインドフルな仲間と共に、ポイントを貯め、ヒーリングガイドを手に入れ、あなたの旅に響くクリスタルを見つけましょう。",
+"Blending Eastern crystal aesthetics with emotional healing and pet companionship — bringing balance, protection, and alignment to your life.":"東洋クリスタル美学、感情ヒーリング、ペットとの絆を融合——あなたの毎日に、調和と守りと癒しを。",
+"Sign up to download":"購読してダウンロード","Leave your email and we'll send the guide straight to your inbox.":"メールアドレスをご登録いただくと、ガイドを直接お届けします。",
+"Get the Guide":"ガイドを入手","Crystal DIY Workshop":"クリスタルDIYワークショップ","A Sanctuary, Carried in Stone":"石に宿る聖域",
+"The Pillars of LuminaGems":"LuminaGemsの3つの柱","ArtisVault Protection Bracelet":"ArtisVault Protection Bracelet",
+"Your Cart":"カートを見る","Welcome back, Sarah":"おかえりなさい、Sarah","Stories, Guides & Crystal Wisdom":"物語、ガイド、クリスタルの英知",
+"Healing Crystals 101: A Beginner's Complete Guide":"ヒーリングクリスタル101:初心者のための完全ガイド","Free Healing Resources":"無料ヒーリングリソース",
+"Get in Touch":"お問い合わせ","View All Products":"すべての商品を見る","Learn More":"詳しく見る",
+"Frequently Asked Questions":"よくある質問","Explore Our Values":"価値観を見る","Read the Blog":"ブログを読む","Download Free Guides":"無料ガイドをダウンロード",
+"Insured global shipping":"保険付き国際配送","We accept":"お支払い方法","Company":"会社概要","Customer Service":"カスタマーサービス","Quick Links":"クイックリンク",
+"Contact information":"連絡先情報","Send us a message":"メッセージを送信","Email":"メール","Phone":"電話","Address":"住所","Live Chat":"ライブチャット",
+"Mon-Fri: 9AM - 6PM EST":"月-金: 東部時間9:00-18:00","Sat-Sun: Email only":"土日:メールのみ",
+"Name":"お名前","Subject":"件名","Your Message":"メッセージ","Send":"送信","Cancel":"キャンセル","Clear":"クリア",
+"FAQ categories":"FAQカテゴリー","All Categories":"すべてのカテゴリー","Product FAQ":"商品に関する質問","Shipping":"配送について","Returns":"返品について","Order Issues":"注文に関する問題",
+"Technical Support":"技術サポート","Wholesale":"卸売について","Popular Questions":"よくある質問","Ask a Question":"質問する",
+"How do I choose the right crystal?":"適切なクリスタルの選び方は?","Are your crystals ethically sourced?":"クリスタルは倫理的に調達されていますか?",
+"How long does shipping take?":"配送にはどのくらいかかりますか?","What is your return policy?":"返品ポリシーは何ですか?",
+"Can I customize a bracelet?":"ブレスレットをカスタマイズできますか?","Are crystals safe for pets?":"クリスタルはペットに安全ですか?",
+"How do I care for my crystals?":"クリスタルのお手入れ方法は?","Do you ship internationally?":"国際配送は可能ですか?",
+"What is your warranty policy?":"保証ポリシーは何ですか?","How do I contact customer support?":"カスタマーサポートへの連絡方法は?",
+"Featured Resources":"注目のリソース","Guide":"ガイド","Workshop":"ワークショップ","Webinar":"ウェビナー","Videos":"動画","Printables":"プリントアウト","Meditations":"瞑想",
+"Customer Stories":"カスタマーストーリー","Testimonials":"お客様の声","Reviews":"レビュー","Loading...":"読み込み中...","More":"もっと見る","Less":"閉じる",
+"Show More":"もっと見る","Show Less":"閉じる","Previous":"前へ","Next":"次へ","Close":"閉じる","Menu":"メニュー","Wishlist":"ウィッシュリスト"
+}
+};
+
+</script>
+<script>
+/* ======== LuminaGems 多语言引擎 v3 ======== */
+const havenLang = {
+    current: localStorage.getItem('haven_lang') || 'EN',
+    initDone: false,
+    init(root) {
+        if (this.initDone) return;
+        const dict = HAVEN_I18N.EN;
+        /* Phase 1: 纯文本叶子节点(无子元素) */
+        const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+            acceptNode(node) {
+                const p = node.parentElement;
+                if (!p) return NodeFilter.FILTER_REJECT;
+                const tag = p.tagName;
+                if (tag === 'SCRIPT' || tag === 'STYLE' || tag === 'TEXTAREA' || tag === 'NOSCRIPT' || tag === 'BR') return NodeFilter.FILTER_REJECT;
+                if (p.children.length > 0) return NodeFilter.FILTER_REJECT;
+                if (p.hasAttribute && p.hasAttribute('data-i18n')) return NodeFilter.FILTER_REJECT;
+                const txt = node.nodeValue.trim();
+                if (!txt || txt.length < 2 || !dict[txt]) return NodeFilter.FILTER_REJECT;
+                return NodeFilter.FILTER_ACCEPT;
+            }
+        });
+        const textNodes = [];
+        while (walker.nextNode()) textNodes.push(walker.currentNode);
+        textNodes.forEach(function(node) {
+            const el = node.parentElement;
+            el.setAttribute('data-i18n', node.nodeValue.trim());
+        });
+        /* Phase 2: 含混合子节点元素 — 逐片段匹配 */
+        const mixedSelector = 'h1,h2,h3,h4,h5,h6,p';
+        root.querySelectorAll(mixedSelector).forEach(function(el) {
+            if (el.hasAttribute('data-i18n')) return;
+            if (el.querySelector('[data-i18n]')) return;
+            /* 跳过纯 <p> 且无 inline 子元素的情况(由 Phase 1 处理) */
+            if (el.tagName === 'P' && !el.querySelector('i,span,br,strong,em,b,u,a')) return;
+            const kids = Array.from(el.childNodes);
+            const textFragments = [];
+            kids.forEach(function(k) {
+                if (k.nodeType === 3) {
+                    const t = k.nodeValue.trim();
+                    if (t && dict[t]) textFragments.push(t);
+                } else if (k.nodeType === 1 && k.tagName === 'BR') {
+                    textFragments.push('\u0000BR\u0000');
+                } else if (k.nodeType === 1 && k.children.length === 0) {
+                    const t = k.textContent.trim();
+                    if (t && dict[t]) textFragments.push(t);
+                }
+            });
+            if (textFragments.length > 0) {
+                const allMatch = textFragments.every(function(f) { return f === '\u0000BR\u0000' || dict[f]; });
+                if (allMatch) {
+                    const struct = kids.map(function(c) {
+                        if (c.nodeType === 3) return { t: 'text', v: c.nodeValue.trim() };
+                        if (c.nodeType === 1 && c.tagName === 'BR') return { t: 'br' };
+                        if (c.nodeType === 1 && c.children.length === 0) {
+                            const tv = c.textContent.trim();
+                            if (tv && dict[tv]) return { t: 'text', v: tv };
+                            return { t: 'keep', html: c.outerHTML };
+                        }
+                        if (c.nodeType === 1 && c.children.length > 0) return { t: 'keep', html: c.outerHTML };
+                        return null;
+                    }).filter(Boolean);
+                    el.setAttribute('data-i18n-struct', JSON.stringify(struct));
+                    el.setAttribute('data-i18n', 'STRUCT');
+                }
+            }
+        });
+        /* Phase 3: input/textarea placeholder */
+        root.querySelectorAll('input,textarea').forEach(function(el) {
+            const ph = el.getAttribute('placeholder');
+            if (ph && dict[ph] && !el.hasAttribute('data-i18n-ph')) el.setAttribute('data-i18n-ph', ph);
+        });
+        /* Phase 4: title / aria-label / img alt */
+        [['[title]', 'title', 'data-i18n-title'], ['[aria-label]', 'aria-label', 'data-i18n-aria'], ['img[alt]', 'alt', 'data-i18n-alt']].forEach(function(pair) {
+            const sel = pair[0], attr = pair[1], marker = pair[2];
+            root.querySelectorAll(sel).forEach(function(el) {
+                const val = el.getAttribute(attr);
+                if (val && dict[val] && !el.hasAttribute(marker)) el.setAttribute(marker, val);
+            });
+        });
+        this.initDone = true;
+    },
+    apply(root) {
+        const dict = HAVEN_I18N[this.current];
+        if (!dict) return;
+        root.querySelectorAll('[data-i18n]').forEach(function(el) {
+            const key = el.getAttribute('data-i18n');
+            if (key === 'STRUCT') {
+                const struct = JSON.parse(el.getAttribute('data-i18n-struct'));
+                const html = struct.map(function(p) {
+                    if (p.t === 'text') return dict[p.v] || p.v;
+                    if (p.t === 'br') return '<br>';
+                    if (p.t === 'keep') return p.html;
+                    return '';
+                }).join('');
+                el.innerHTML = html;
+            } else {
+                if (dict[key]) el.textContent = dict[key];
+            }
+        });
+        root.querySelectorAll('[data-i18n-ph]').forEach(function(el) {
+            const orig = el.getAttribute('data-i18n-ph');
+            if (dict[orig]) el.setAttribute('placeholder', dict[orig]);
+        });
+        root.querySelectorAll('[data-i18n-title]').forEach(function(el) {
+            const orig = el.getAttribute('data-i18n-title');
+            if (dict[orig]) el.setAttribute('title', dict[orig]);
+        });
+        root.querySelectorAll('[data-i18n-aria]').forEach(function(el) {
+            const orig = el.getAttribute('data-i18n-aria');
+            if (dict[orig]) el.setAttribute('aria-label', dict[orig]);
+        });
+        root.querySelectorAll('[data-i18n-alt]').forEach(function(el) {
+            const orig = el.getAttribute('data-i18n-alt');
+            if (dict[orig]) el.setAttribute('alt', dict[orig]);
+        });
+        const isCJK = (this.current === 'ZH' || this.current === 'JA');
+        root.querySelectorAll('.text-shadow').forEach(function(el) {
+            if (isCJK) el.style.textShadow = '0 1px 8px rgba(0,0,0,0.3)';
+            else el.style.textShadow = '';
+        });
+    },
+    set(lang) {
+        if (!HAVEN_I18N[lang]) return;
+        this.current = lang;
+        localStorage.setItem('haven_lang', lang);
+        document.querySelectorAll('#langCurrent').forEach(function(el) { el.textContent = lang; });
+        document.querySelectorAll('.lang-option').forEach(function(opt) {
+            opt.classList.toggle('active', opt.dataset.lang === lang);
+        });
+        this.apply(document.body);
+    }
+};
+document.addEventListener('DOMContentLoaded', function() {
+    havenLang.init(document.body);
+    havenLang.apply(document.body);
+    document.querySelectorAll('#langCurrent').forEach(function(el) { el.textContent = havenLang.current; });
+    document.querySelectorAll('.lang-option').forEach(function(opt) {
+        opt.classList.toggle('active', opt.dataset.lang === havenLang.current);
+    });
+});
+const searchOverlay = document.getElementById('searchOverlay');
+document.getElementById('searchBtn')?.addEventListener('click', function() {
+    searchOverlay.classList.add('active');
+    setTimeout(function() { document.getElementById('searchInput')?.focus(); }, 300);
+});
+document.getElementById('searchClose')?.addEventListener('click', function() {
+    searchOverlay.classList.remove('active');
+});
+searchOverlay?.addEventListener('click', function(e) {
+    if (e.target === searchOverlay) searchOverlay.classList.remove('active');
+});
+document.getElementById('searchForm')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const q = document.getElementById('searchInput').value.trim();
+    window.location.href = q ? 'products.html?q=' + encodeURIComponent(q) : 'products.html';
+});
+const langToggle = document.getElementById('langToggle');
+const langMenu = document.getElementById('langMenu');
+langToggle?.addEventListener('click', function(e) {
+    e.stopPropagation();
+    langMenu.classList.toggle('show');
+});
+document.addEventListener('click', function() { langMenu?.classList.remove('show'); });
+document.querySelectorAll('.lang-option').forEach(function(opt) {
+    opt.addEventListener('click', function(ev) {
+        ev.stopPropagation();
+        havenLang.set(opt.dataset.lang);
+        langMenu.classList.remove('show');
+    });
+});
+</script>
+
+
+
+</body>
+</html>

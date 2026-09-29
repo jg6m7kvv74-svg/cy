@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop by Intention - Crystal Jewelry</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        body {
+            background-color: #f9f7f5;
+            color: #333;
+            line-height: 1.6;
+            padding: 2rem 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        /* 引导语样式 */
+        .intro {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 0 1rem;
+        }
+        .intro h1 {
+            font-size: 2.2rem;
+            color: #5a4b60;
+            margin-bottom: 1rem;
+        }
+        .intro p {
+            font-size: 1.1rem;
+            color: #666;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        /* 分类标题样式 */
+        .intention-section {
+            margin-bottom: 4rem;
+        }
+        .intention-title {
+            font-size: 1.8rem;
+            color: #5a4b60;
+            border-bottom: 2px solid #d8c3d0;
+            padding-bottom: 0.5rem;
+            margin-bottom: 2rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        /* 产品网格布局 */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+        /* 产品卡片样式 */
+        .product-card {
+            background-color: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        }
+        .product-img {
+            height: 220px;
+            background-color: #f0ebe6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .product-img img {
+            max-width: 80%;
+            max-height: 180px;
+            object-fit: contain;
+        }
+        .product-badge {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .badge-new {
+            background-color: #d8c3d0;
+            color: #fff;
+        }
+        .badge-best-seller {
+            background-color: #e9a87c;
+            color: #fff;
+        }
+        .badge-sale {
+            background-color: #e74c3c;
+            color: #fff;
+        }
+        .badge-back-in-stock {
+            background-color: #2ecc71;
+            color: #fff;
+        }
+        .product-content {
+            padding: 1.5rem;
+        }
+        .product-name {
+            font-size: 1.2rem;
+            color: #333;
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+        }
+        .product-benefits {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .benefit-tag {
+            background-color: #f5f0f4;
+            color: #5a4b60;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+        .product-price {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        .original-price {
+            font-size: 0.9rem;
+            color: #999;
+            text-decoration: line-through;
+        }
+        .sale-price {
+            font-size: 1.1rem;
+            color: #e74c3c;
+            font-weight: 600;
+        }
+        .regular-price {
+            font-size: 1.1rem;
+            color: #333;
+            font-weight: 600;
+        }
+        .product-size {
+            margin-bottom: 1rem;
+        }
+        .size-label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        .size-options {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .size-btn {
+            background-color: #f5f0f4;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            color: #5a4b60;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .size-btn:hover, .size-btn.active {
+            background-color: #d8c3d0;
+            color: #fff;
+        }
+        /* 调整链接样式，使其和原按钮一致 */
+        .add-to-cart {
+            display: block;
+            width: 100%;
+            background-color: #5a4b60;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 0;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            text-align: center;
+            text-decoration: none; /* 去掉链接下划线 */
+        }
+        .add-to-cart:hover {
+            background-color: #43364a;
+            color: #fff; /* 确保hover时文字颜色不变 */
+            text-decoration: none;
+        }
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .intro h1 {
+                font-size: 1.8rem;
+            }
+            .intention-title {
+                font-size: 1.5rem;
+            }
+            .product-grid {
+                grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 引导语区域 -->
+    <section class="intro">
+        <h1>Set an Intention with Your Crystals</h1>
+        <p>Our gemstones and healing crystals serve as a tool to help connect our conscious thoughts with our body. Program them with a specific intention—their frequencies will magnify your thoughts and guide your transformation.</p>
+    </section>
+
+    <!-- ArtisVault -->
+    <section class="intention-section">
+        <h2 class="intention-title">ArtisVault</h2>
+        <div class="product-grid">
+            <!-- 417Hz频率手链 -->
+            <div class="product-card">
+                <div class="product-img">
+                    <span class="product-badge badge-new">New</span>
+                    <img src="placeholder-1.jpg" alt="417Hz Frequency Bracelet">
+                </div>
+                <div class="product-content">
+                    <h3 class="product-name">417Hz Frequency Bracelet</h3>
+                    <div class="product-benefits">
+                        <span class="benefit-tag">Energetic Clearing</span>
+                        <span class="benefit-tag">Courageous Change</span>
+                        <span class="benefit-tag">Aligned Action</span>
+                    </div>
+                    <div class="product-price">
+                        <span class="regular-price">from $44.88</span>
+                    </div>
+                    <div class="product-size">
+                        <span class="size-label">Size:</span>
+                        <div class="size-options">
+                            <button class="size-btn active">6.75"</button>
+                        </div>
+                    </div>
+                    <!-- 替换为a链接，添加跳转地址 -->
+                    <a href="https://energymuse.com/collections/balance-focus/products/174hz-frequency-bracelet" class="add-to-cart" target="_self">Add to Cart</a>
+                </div>
+            </div>
+
+            <!-- 黑碧玺手链 -->
+            <div class="product-card">
+                <div class="product-img">
+                    <span class="product-badge badge-new">New</span>
+                    <img src="placeholder-2.jpg" alt="Shungite Bracelet (6mm)">
+                </div>
+                <div class="product-content">
+                    <h3 class="product-name">Shungite Bracelet (6mm)</h3>
+                    <div class="product-benefits">
+                        <span class="benefit-tag">Purification</span>
+                        <span class="benefit-tag">Protection</span>
+                        <span class="benefit-tag">Detox</span>
+                    </div>
+                    <div class="product-price">
+                        <span class="regular-price">from $19.88</span>
+                    </div>
+                    <div class="product-size">
+                        <span class="size-label">Size:</span>
+                        <div class="size-options">
+                            <button class="size-btn active">6.75"</button>
+                        </div>
+                    </div>
+                    <a href="https://energymuse.com/collections/balance-focus/products/174hz-frequency-bracelet" class="add-to-cart" target="_self">Add to Cart</a>
+                </div>
+            </div>
+
+            <!-- 保护水晶手链 -->
+            <div class="product-card">
+                <div class="product-img">
+                    <span class="product-badge badge-best-seller">Best Seller</span>
+                    <img src="placeholder-3.jpg" alt="Protection Crystal Bracelet">
+                </div>
+                <div class="product-content">
+                    <h3 class="product-name">Protection Crystal Bracelet</h3>
+                    <div class="product-benefits">
+                        <span class="benefit-tag">Protection</span>
+                        <span class="benefit-tag">Security</span>
+                        <span class="benefit-tag">Boundaries</span>
+                    </div>
+                    <div class="product-price">
+                        <span class="regular-price">from $24.88</span>
+                    </div>
+                    <div class="product-size">
+                        <span class="size-label">Size:</span>
+                        <div class="size-options">
+                            <button class="size-btn active">S</button>
+                        </div>
+                    </div>
+                    <a href="https://energymuse.com/collections/balance-focus/products/174hz-frequency-bracelet" class="add-to-cart" target="_self">Add to Cart</a>
+                </div>
+            </div>
+
+            <!-- 电气石石英手链 -->
+            <div class="product-card">
+                <div class="product-img">
+                    <span class="product-badge badge-new">New</span>
+                    <img src="placeholder-4.jpg" alt="Tourmalinated Quartz Bracelet">
+                </div>
+                <div class="product-content">
+                    <h3 class="product-name">Tourmalinated Quartz Bracelet</h3>
+                    <div class="product-benefits">
+                        <span class="benefit-tag">Remove Obstacles</span>
+                        <span class="benefit-tag">Clearing Karma</span>
+                        <span class="benefit-tag">Shifting Negativity</span>
+                    </div>
+                    <div class="product-price">
+                        <span class="regular-price">from $24.88</span>
+                    </div>
+                    <div class="product-size">
+                        <span class="size-label">Size:</span>
+                        <div class="size-options">
+                            <button class="size-btn active">6.75"</button>
+                        </div>
+                    </div>
+                    <a href="https://energymuse.com/collections/balance-focus/products/174hz-frequency-bracelet" class="add-to-cart" target="_self">Add to Cart</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 财富与成功分类 -->
+    <section class="intention-section">
+        <h2 class="intention-title">Wealth & Success</h2>
+        <div class="product-grid">
+            <!-- 杨梅蜡烛 -->
+            <div class="product-card">
+                <div class="product-img">
+                    <span class="product-badge badge-new">New</span>
+                    <span class="product-badge badge-sale">Sale</span>
+                    <img src="placeholder-5.jpg" alt="Bayberry Candle">
+                </div>
+                <div class="product-content">
+                    <h3 class="product-name">Bayberry Candle</h3>
+                    <div class="product-benefits">
+                        <span class="benefit-tag">Prosperity</span>
+                        <span class="benefit-tag">Road Opening</span>
+                        <span class="benefit-tag">Lasting Abundance</span>
+                    </div>
+                    <div class="product-price">
+                        <span class="original-price">$79.52</span>
+                        <span class="sale-price">from $19.88</span>
+                    </div>
+                    <div class="product-size">
+                        <span class="size-label"># of Candles:</span>
+                        <div class="size-options">
+                            <button class="size-btn active">1 Candle (5-7 days)</button>
+                        </div>
+                    </div>
+                    <a href="https://energymuse.com/collections/balance-focus/products/174hz-frequency-bracelet" class="add-to-cart" target="_self">Add to Cart</a>
+                </div>
+            </div>
+
+            <!-- 黄水晶生命之花盆栽 -->
+            <div class="product-card">
+                <div class="product-img">
+                    <span class="product-badge badge-new">New</span>
+                    <img src="placeholder-6.jpg" alt="Citrine Gem Tree with Flower of Life Pot">
+                </div>
+                <div class="product-content">
+                    <h3 class="product-name">Citrine Gem Tree with Flower of Life Pot</h3>
+                    <div class="product-benefits">
+                        <span class="benefit-tag">Abundance</span>
+                        <span class="benefit-tag">Prosperity</span>
+                        <span class="benefit-tag">Growth</span>
+                    </div>
+                    <div class="product-price">
+                        <span class="regular-price">$32.88</span>
+                    </div>
+                    <a href="https://energymuse.com/collections/balance-focus/products/174hz-frequency-bracelet" class="add-to-cart" target="_self">Add to Cart</a>
+                </div>
+            </div>
+
+            <!-- 黄铁矿立方体 -->
+            <div class="product-card">
+                <div class="product-img">
+                    <span class="product-badge badge-new">New</span>
+                    <img src="placeholder-7.jpg" alt="Pyrite Cube">
+                </div>
+                <div class="product-content">
+                    <h3 class="product-name">Pyrite Cube</h3>
+                    <div class="product-benefits">
+                        <span class="benefit-tag">Abundance</span>
+                        <span class="benefit-tag">Prosperity</span>
+                        <span class="benefit-tag">Wealth</span>
+                    </div>
+                    <div class="product-price">
+                        <span class="regular-price">from $24.88</span>
+                    </div>
+                    <div class="product-size">
+                        <span class="size-label">Size:</span>
+                        <div class="size-options">
+                            <button class="size-btn active">S (0.75" - 1")</button>
+                        </div>
+                    </div>
+                    <a href="https://energymuse.com/collections/balance-focus/products/174hz-frequency-bracelet" class="add-to-cart" target="_self">Add to Cart</a>
+                </div>
+            </div>
+
+            <!-- 528Hz频率手链 -->
+            <div class="product-card">
+                <div class="product-img">
+                    <span class="product-badge badge-back-in-stock">Back in Stock</span>
+                    <img src="placeholder-8.jpg" alt="528Hz Frequency Bracelet">
+                </div>
+                <div class="product-content">
+                    <h3 class="product-name">528Hz Frequency Bracelet</h3>
+                    <div class="product-benefits">
+                        <span class="benefit-tag">Miracle Manifestation</span>
+                        <span class="benefit-tag">Energetic Alignment</span>
+                        <span class="benefit-tag">Frequency-Infused Transformation</span>
+                    </div>
+                    <div class="product-price">
+                        <span class="regular-price">from $44.88</span>
+                    </div>
+                    <div class="product-size">
+                        <span class="size-label">Size:</span>
+                        <div class="size-options">
+                            <button class="size-btn active">6.75"</button>
+                        </div>
+                    </div>
+                    <a href="https://energymuse.com/collections/balance-focus/products/174hz-frequency-bracelet" class="add-to-cart" target="_self">Add to Cart</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 平衡与专注分类（示例，其余分类可按相同结构扩展） -->
+    <section class="intention-section">
+        <h2 class="intention-title">Balance & Focus</h2>
+        <div class="product-grid">
+            <div class="product-card">
+                <div class="product-img">
+                    <span class="product-badge badge-new">New</span>
+                    <img src="placeholder-9.jpg" alt="Solid Copper Harmonizers">
+                </div>
+                <div class="product-content">
+                    <h3 class="product-name">Solid Copper Harmonizers</h3>
+                    <div class="product-benefits">
+                        <span class="benefit-tag">Balance</span>
+                        <span class="benefit-tag">Meditation</span>
+                        <span class="benefit-tag">Charging</span>
+                    </div>
+                    <div class="product-price">
+                        <span class="regular-price">$49.88</span>
+                    </div>
+                    <a href="https://energymuse.com/collections/balance-focus/products/174hz-frequency-bracelet" class="add-to-cart" target="_self">Add to Cart</a>
+                </div>
+            </div>
+
+            <!-- 其余产品卡片按相同结构添加 -->
+        </div>
+    </section>
+
+    <!-- 健康与 wellness、爱与幸福、新开始、激情与创造力、灵性与信仰 分类可按上述结构依次扩展 -->
+</body>
+</html>
